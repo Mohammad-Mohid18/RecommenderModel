@@ -31,9 +31,14 @@ logger = logging.getLogger(__name__)
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 MODEL_PATH           = "startup_investor_pipeline.pkl"
-import os
+import os, json
+from firebase_admin import credentials
 
-SERVICE_ACCOUNT_PATH = os.environ.get("FIREBASE_CRED_PATH", "serviceAccounts.json")
+firebase_creds_json = os.environ.get("FIREBASE_CREDENTIALS_JSON")
+if firebase_creds_json:
+    cred = credentials.Certificate(json.loads(firebase_creds_json))
+else:
+    cred = credentials.Certificate("serviceAccounts.json")  # local fallback
 FIRESTORE_COLLECTION = "startup_profiles"
 LOCAL_STARTUPS_PATH  = Path(os.getenv("LOCAL_STARTUPS_PATH", "firebase_startup_profiles.csv"))
 USE_FIRESTORE        = os.getenv("USE_FIRESTORE", "0").strip().lower() in {"1", "true", "yes"}

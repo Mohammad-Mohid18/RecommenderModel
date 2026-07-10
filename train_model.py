@@ -55,9 +55,13 @@ INVESTOR_SNAPSHOT_PATH = DATA_DIR / "firebase_investor_profiles.csv"
 
 def init_firestore():
     if not firebase_admin._apps:
-        firebase_admin.initialize_app(credentials.Certificate(
-            os.environ.get("FIREBASE_CRED_PATH", "serviceAccounts.json")
-        ))
+        import os, json
+
+        firebase_creds_json = os.environ.get("FIREBASE_CREDENTIALS_JSON")
+        if firebase_creds_json:
+            firebase_admin.initialize_app(credentials.Certificate(json.loads(firebase_creds_json)))
+        else:
+            firebase_admin.initialize_app(credentials.Certificate("serviceAccounts.json"))
     return firestore.client()
 
 
