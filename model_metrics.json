@@ -1,0 +1,223 @@
+{
+  "data_source": "firestore",
+  "recommendation_direction": "investor_to_startups",
+  "label_source": "rule_based_investor_preferences_from_firestore",
+  "startup_profiles": 500,
+  "investor_profiles": 500,
+  "positive_pairs": 2500,
+  "negative_pairs": 2500,
+  "total_pairs": 5000,
+  "test_size": 1000,
+  "accuracy": 0.988,
+  "precision": 0.9803149606299213,
+  "recall": 0.996,
+  "f1": 0.9880952380952381,
+  "roc_auc": 0.998112,
+  "average_precision": 0.9979050738109222,
+  "confusion_matrix": [
+    [
+      490,
+      10
+    ],
+    [
+      2,
+      498
+    ]
+  ],
+  "classification_report": {
+    "0": {
+      "precision": 0.9959349593495935,
+      "recall": 0.98,
+      "f1-score": 0.9879032258064516,
+      "support": 500.0
+    },
+    "1": {
+      "precision": 0.9803149606299213,
+      "recall": 0.996,
+      "f1-score": 0.9880952380952381,
+      "support": 500.0
+    },
+    "accuracy": 0.988,
+    "macro avg": {
+      "precision": 0.9881249599897575,
+      "recall": 0.988,
+      "f1-score": 0.9879992319508448,
+      "support": 1000.0
+    },
+    "weighted avg": {
+      "precision": 0.9881249599897574,
+      "recall": 0.988,
+      "f1-score": 0.9879992319508449,
+      "support": 1000.0
+    }
+  },
+  "score_stats_test": {
+    "min": 1.0113611922375605e-08,
+    "max": 0.9999817661908086,
+    "mean": 0.5017759476034588,
+    "median": 0.6810878094184725
+  },
+  "sample_investor_id": "I1",
+  "sample_recommendation_scores": [
+    {
+      "startup_id": "S210",
+      "match_score": 0.9999
+    },
+    {
+      "startup_id": "S305",
+      "match_score": 0.9999
+    },
+    {
+      "startup_id": "S244",
+      "match_score": 0.9998
+    },
+    {
+      "startup_id": "S418",
+      "match_score": 0.9989
+    },
+    {
+      "startup_id": "S265",
+      "match_score": 0.9978
+    },
+    {
+      "startup_id": "S145",
+      "match_score": 0.9967
+    },
+    {
+      "startup_id": "S285",
+      "match_score": 0.9965
+    },
+    {
+      "startup_id": "S496",
+      "match_score": 0.9963
+    },
+    {
+      "startup_id": "S58",
+      "match_score": 0.9813
+    },
+    {
+      "startup_id": "S110",
+      "match_score": 0.9223
+    },
+    {
+      "startup_id": "S21",
+      "match_score": 0.9119
+    },
+    {
+      "startup_id": "S300",
+      "match_score": 0.8944
+    },
+    {
+      "startup_id": "S61",
+      "match_score": 0.868
+    },
+    {
+      "startup_id": "S182",
+      "match_score": 0.8011
+    },
+    {
+      "startup_id": "S206",
+      "match_score": 0.7766
+    },
+    {
+      "startup_id": "S9",
+      "match_score": 0.76
+    },
+    {
+      "startup_id": "S476",
+      "match_score": 0.7283
+    },
+    {
+      "startup_id": "S119",
+      "match_score": 0.7244
+    },
+    {
+      "startup_id": "S82",
+      "match_score": 0.6762
+    },
+    {
+      "startup_id": "S53",
+      "match_score": 0.6473
+    },
+    {
+      "startup_id": "S2",
+      "match_score": 0.6342
+    },
+    {
+      "startup_id": "S428",
+      "match_score": 0.633
+    },
+    {
+      "startup_id": "S454",
+      "match_score": 0.6177
+    },
+    {
+      "startup_id": "S32",
+      "match_score": 0.6177
+    },
+    {
+      "startup_id": "S186",
+      "match_score": 0.5349
+    },
+    {
+      "startup_id": "S211",
+      "match_score": 0.5006
+    },
+    {
+      "startup_id": "S204",
+      "match_score": 0.4931
+    },
+    {
+      "startup_id": "S18",
+      "match_score": 0.4904
+    },
+    {
+      "startup_id": "S451",
+      "match_score": 0.4545
+    },
+    {
+      "startup_id": "S1",
+      "match_score": 0.447
+    },
+    {
+      "startup_id": "S397",
+      "match_score": 0.4311
+    },
+    {
+      "startup_id": "S10",
+      "match_score": 0.3828
+    },
+    {
+      "startup_id": "S464",
+      "match_score": 0.3693
+    },
+    {
+      "startup_id": "S390",
+      "match_score": 0.1676
+    },
+    {
+      "startup_id": "S396",
+      "match_score": 0.1004
+    },
+    {
+      "startup_id": "S368",
+      "match_score": 0.0775
+    },
+    {
+      "startup_id": "S226",
+      "match_score": 0.0739
+    },
+    {
+      "startup_id": "S200",
+      "match_score": 0.0538
+    },
+    {
+      "startup_id": "S278",
+      "match_score": 0.0529
+    },
+    {
+      "startup_id": "S198",
+      "match_score": 0.0497
+    }
+  ]
+}

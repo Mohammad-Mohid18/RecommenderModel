@@ -1,0 +1,501 @@
+startup_id,category,budget_required,status,location,risk_level,traction_level
+S1,SaaS,100k-500k,Idea,Saudi Arabia,High,None
+S2,SaaS,10k-100k,Scaling,Turkey,Medium,Revenue
+S3,AI,50k-200k,Idea,Saudi Arabia,High,None
+S4,LogisticsTech,50k-200k,Growth,Nigeria,Low,Users
+S5,E-commerce,100k-500k,Growth,UK,Medium,Users
+S6,EdTech,10k-100k,Idea,Bangladesh,High,None
+S7,EdTech,100k-500k,Scaling,Pakistan,Medium,Revenue
+S8,CleanTech,2M-10M,Idea,UK,High,None
+S9,SaaS,50k-200k,Idea,UK,High,None
+S10,SaaS,100k-500k,Growth,Nigeria,Low,Users
+S11,EdTech,50k-200k,Early Traction,UK,Medium,Users
+S12,LogisticsTech,50k-200k,MVP,Nigeria,Medium,Users
+S13,LogisticsTech,100k-500k,MVP,Pakistan,High,None
+S14,EdTech,100k-500k,Growth,India,Medium,Revenue
+S15,FinTech,500k-2M,Growth,Nigeria,Medium,Revenue
+S16,E-commerce,2M-10M,MVP,Egypt,Medium,Users
+S17,PropTech,100k-500k,Growth,Saudi Arabia,Medium,Revenue
+S18,SaaS,10k-100k,Idea,UAE,High,None
+S19,PropTech,500k-2M,Idea,Bangladesh,High,None
+S20,LogisticsTech,10k-100k,Idea,Egypt,High,None
+S21,SaaS,500k-2M,Early Traction,UAE,High,Users
+S22,HealthTech,50k-200k,Scaling,Egypt,Low,Revenue
+S23,LogisticsTech,50k-200k,Scaling,UAE,Medium,Revenue
+S24,LogisticsTech,10k-100k,Scaling,Turkey,Medium,Revenue
+S25,AI,100k-500k,Idea,UK,High,None
+S26,FinTech,10k-100k,Scaling,India,Medium,Revenue
+S27,LogisticsTech,50k-200k,MVP,Nigeria,High,Users
+S28,LogisticsTech,500k-2M,Scaling,Saudi Arabia,Low,Revenue
+S29,CleanTech,500k-2M,Early Traction,Egypt,High,Users
+S30,FinTech,10k-100k,MVP,USA,High,None
+S31,PropTech,10k-100k,MVP,India,High,None
+S32,SaaS,100k-500k,Idea,India,High,None
+S33,AgriTech,2M-10M,MVP,UAE,Medium,None
+S34,AgriTech,50k-200k,Growth,India,Medium,Revenue
+S35,EdTech,500k-2M,Growth,Nigeria,Medium,Users
+S36,AI,100k-500k,Growth,India,Medium,Users
+S37,FinTech,500k-2M,Scaling,UAE,Medium,Revenue
+S38,HealthTech,50k-200k,Growth,India,Low,Users
+S39,AI,10k-100k,Scaling,India,Low,Revenue
+S40,CleanTech,500k-2M,Growth,Saudi Arabia,Low,Users
+S41,E-commerce,10k-100k,Growth,Bangladesh,Low,Revenue
+S42,HealthTech,2M-10M,Growth,Nigeria,Medium,Users
+S43,HealthTech,10k-100k,MVP,Turkey,High,Users
+S44,AI,2M-10M,Idea,Nigeria,High,None
+S45,LogisticsTech,50k-200k,Idea,India,High,None
+S46,CleanTech,2M-10M,Idea,Saudi Arabia,High,None
+S47,CleanTech,2M-10M,Scaling,Egypt,Medium,Revenue
+S48,FinTech,50k-200k,Early Traction,UK,High,Users
+S49,HealthTech,100k-500k,Growth,India,Medium,Revenue
+S50,PropTech,10k-100k,Scaling,India,Low,Revenue
+S51,E-commerce,10k-100k,Early Traction,Saudi Arabia,High,Users
+S52,E-commerce,2M-10M,Growth,UK,Medium,Revenue
+S53,SaaS,100k-500k,MVP,India,High,None
+S54,HealthTech,2M-10M,Early Traction,Saudi Arabia,High,Users
+S55,HealthTech,500k-2M,Scaling,UK,Low,Revenue
+S56,CleanTech,10k-100k,Early Traction,Pakistan,High,Users
+S57,HealthTech,500k-2M,MVP,Egypt,Medium,None
+S58,SaaS,50k-200k,Idea,Egypt,High,None
+S59,PropTech,50k-200k,Scaling,Bangladesh,Low,Revenue
+S60,HealthTech,10k-100k,Early Traction,USA,Medium,Users
+S61,SaaS,2M-10M,Early Traction,Bangladesh,Medium,Users
+S62,E-commerce,500k-2M,MVP,Pakistan,High,Users
+S63,CleanTech,100k-500k,MVP,UAE,High,Users
+S64,AI,50k-200k,Growth,Saudi Arabia,Low,Revenue
+S65,HealthTech,50k-200k,MVP,Pakistan,High,Users
+S66,EdTech,10k-100k,Early Traction,UK,High,Users
+S67,LogisticsTech,10k-100k,Early Traction,India,High,Users
+S68,PropTech,10k-100k,Early Traction,India,High,Users
+S69,EdTech,2M-10M,Growth,Egypt,Medium,Revenue
+S70,PropTech,100k-500k,MVP,Pakistan,Medium,None
+S71,LogisticsTech,50k-200k,Scaling,USA,Medium,Revenue
+S72,EdTech,100k-500k,Scaling,India,Medium,Revenue
+S73,CleanTech,500k-2M,Early Traction,UK,Medium,Users
+S74,CleanTech,50k-200k,Growth,Turkey,Low,Revenue
+S75,LogisticsTech,100k-500k,Idea,UK,High,None
+S76,PropTech,100k-500k,Scaling,Nigeria,Medium,Revenue
+S77,FinTech,500k-2M,Scaling,UAE,Low,Revenue
+S78,LogisticsTech,100k-500k,Scaling,India,Low,Revenue
+S79,FinTech,50k-200k,MVP,Pakistan,High,None
+S80,AgriTech,10k-100k,Scaling,Nigeria,Medium,Revenue
+S81,CleanTech,500k-2M,Growth,Saudi Arabia,Medium,Users
+S82,SaaS,50k-200k,Growth,UAE,Low,Users
+S83,LogisticsTech,10k-100k,MVP,Nigeria,High,Users
+S84,LogisticsTech,2M-10M,Scaling,USA,Medium,Revenue
+S85,LogisticsTech,50k-200k,Growth,Nigeria,Low,Revenue
+S86,FinTech,2M-10M,Early Traction,Nigeria,Medium,Users
+S87,AgriTech,100k-500k,Idea,Saudi Arabia,High,None
+S88,EdTech,10k-100k,Scaling,UAE,Low,Revenue
+S89,CleanTech,50k-200k,MVP,India,Medium,Users
+S90,EdTech,500k-2M,Scaling,Bangladesh,Low,Revenue
+S91,CleanTech,2M-10M,Growth,Pakistan,Low,Revenue
+S92,AI,100k-500k,Early Traction,Bangladesh,High,Users
+S93,AgriTech,100k-500k,MVP,Bangladesh,Medium,None
+S94,CleanTech,500k-2M,Early Traction,UAE,High,Users
+S95,PropTech,10k-100k,Scaling,Bangladesh,Low,Revenue
+S96,CleanTech,500k-2M,MVP,UAE,High,Users
+S97,CleanTech,50k-200k,Early Traction,Nigeria,High,Users
+S98,CleanTech,500k-2M,Early Traction,UK,Medium,Users
+S99,AI,10k-100k,Scaling,USA,Low,Revenue
+S100,AI,50k-200k,Idea,Saudi Arabia,High,None
+S101,FinTech,500k-2M,MVP,India,High,Users
+S102,HealthTech,50k-200k,Early Traction,Turkey,Medium,Users
+S103,HealthTech,2M-10M,Idea,Pakistan,High,None
+S104,CleanTech,10k-100k,MVP,Turkey,High,None
+S105,HealthTech,10k-100k,Scaling,Turkey,Low,Revenue
+S106,LogisticsTech,100k-500k,Growth,India,Low,Users
+S107,CleanTech,10k-100k,Growth,Bangladesh,Low,Revenue
+S108,E-commerce,50k-200k,Growth,Egypt,Low,Revenue
+S109,AgriTech,2M-10M,Growth,UK,Low,Users
+S110,SaaS,500k-2M,Early Traction,Saudi Arabia,High,Users
+S111,EdTech,500k-2M,Idea,USA,High,None
+S112,FinTech,100k-500k,Early Traction,USA,High,Users
+S113,LogisticsTech,2M-10M,Idea,Saudi Arabia,High,None
+S114,CleanTech,2M-10M,Growth,Saudi Arabia,Low,Revenue
+S115,AgriTech,10k-100k,Idea,UK,High,None
+S116,FinTech,2M-10M,Early Traction,USA,High,Users
+S117,CleanTech,100k-500k,Scaling,USA,Medium,Revenue
+S118,HealthTech,50k-200k,Early Traction,India,Medium,Users
+S119,SaaS,50k-200k,Scaling,Saudi Arabia,Low,Revenue
+S120,HealthTech,2M-10M,Scaling,Turkey,Medium,Revenue
+S121,FinTech,50k-200k,Early Traction,USA,Medium,Users
+S122,AI,50k-200k,Scaling,UK,Low,Revenue
+S123,LogisticsTech,50k-200k,Early Traction,Nigeria,Medium,Users
+S124,PropTech,500k-2M,Early Traction,Nigeria,High,Users
+S125,E-commerce,100k-500k,Idea,Nigeria,High,None
+S126,CleanTech,10k-100k,Growth,Turkey,Medium,Users
+S127,E-commerce,100k-500k,Scaling,India,Low,Revenue
+S128,LogisticsTech,2M-10M,Growth,Turkey,Medium,Revenue
+S129,AgriTech,100k-500k,Growth,Turkey,Low,Revenue
+S130,PropTech,10k-100k,Scaling,Turkey,Low,Revenue
+S131,FinTech,10k-100k,Early Traction,UAE,Medium,Users
+S132,LogisticsTech,50k-200k,Idea,Pakistan,High,None
+S133,PropTech,100k-500k,Growth,Pakistan,Medium,Revenue
+S134,HealthTech,10k-100k,Growth,Saudi Arabia,Low,Users
+S135,CleanTech,2M-10M,Idea,Saudi Arabia,High,None
+S136,E-commerce,10k-100k,Idea,UAE,High,None
+S137,AgriTech,500k-2M,Idea,UK,High,None
+S138,LogisticsTech,500k-2M,Scaling,Nigeria,Low,Revenue
+S139,CleanTech,2M-10M,Early Traction,UK,Medium,Users
+S140,FinTech,2M-10M,Scaling,Pakistan,Medium,Revenue
+S141,E-commerce,2M-10M,Growth,Nigeria,Low,Users
+S142,PropTech,500k-2M,Growth,India,Low,Revenue
+S143,CleanTech,100k-500k,Early Traction,India,Medium,Users
+S144,CleanTech,100k-500k,Growth,Bangladesh,Medium,Revenue
+S145,SaaS,100k-500k,Early Traction,USA,Medium,Users
+S146,LogisticsTech,2M-10M,Idea,Nigeria,High,None
+S147,FinTech,100k-500k,Scaling,Turkey,Medium,Revenue
+S148,AI,100k-500k,MVP,Egypt,High,Users
+S149,AgriTech,10k-100k,Growth,Pakistan,Medium,Users
+S150,HealthTech,10k-100k,Scaling,Egypt,Medium,Revenue
+S151,FinTech,500k-2M,Idea,India,High,None
+S152,HealthTech,100k-500k,Scaling,Bangladesh,Medium,Revenue
+S153,FinTech,2M-10M,Growth,UAE,Low,Users
+S154,PropTech,50k-200k,Scaling,India,Medium,Revenue
+S155,EdTech,100k-500k,Scaling,Pakistan,Medium,Revenue
+S156,PropTech,500k-2M,Scaling,UAE,Medium,Revenue
+S157,EdTech,2M-10M,Early Traction,Egypt,High,Users
+S158,EdTech,50k-200k,MVP,Turkey,Medium,None
+S159,CleanTech,100k-500k,Idea,Nigeria,High,None
+S160,E-commerce,10k-100k,Growth,UAE,Low,Users
+S161,AgriTech,2M-10M,Idea,Nigeria,High,None
+S162,CleanTech,10k-100k,MVP,Nigeria,Medium,Users
+S163,PropTech,10k-100k,Growth,USA,Low,Revenue
+S164,AgriTech,10k-100k,Scaling,Turkey,Low,Revenue
+S165,HealthTech,10k-100k,MVP,Bangladesh,High,None
+S166,AgriTech,100k-500k,MVP,Pakistan,High,Users
+S167,AI,100k-500k,Early Traction,USA,High,Users
+S168,FinTech,500k-2M,Scaling,Turkey,Low,Revenue
+S169,E-commerce,2M-10M,Idea,Bangladesh,High,None
+S170,PropTech,50k-200k,MVP,Nigeria,Medium,Users
+S171,HealthTech,500k-2M,Idea,UK,High,None
+S172,AgriTech,2M-10M,Early Traction,UK,High,Users
+S173,AgriTech,50k-200k,Early Traction,Bangladesh,High,Users
+S174,FinTech,2M-10M,Growth,USA,Low,Revenue
+S175,AI,100k-500k,Growth,Pakistan,Medium,Revenue
+S176,HealthTech,2M-10M,MVP,USA,High,None
+S177,PropTech,50k-200k,Early Traction,India,Medium,Users
+S178,AgriTech,2M-10M,Idea,USA,High,None
+S179,HealthTech,500k-2M,Early Traction,UAE,Medium,Users
+S180,LogisticsTech,2M-10M,Early Traction,Egypt,High,Users
+S181,HealthTech,100k-500k,Growth,USA,Medium,Revenue
+S182,SaaS,50k-200k,MVP,Bangladesh,Medium,None
+S183,CleanTech,100k-500k,Idea,Egypt,High,None
+S184,EdTech,2M-10M,Early Traction,Bangladesh,High,Users
+S185,FinTech,10k-100k,Growth,Turkey,Low,Users
+S186,SaaS,100k-500k,Growth,Bangladesh,Medium,Users
+S187,AI,100k-500k,Idea,Nigeria,High,None
+S188,FinTech,50k-200k,Scaling,Bangladesh,Medium,Revenue
+S189,LogisticsTech,2M-10M,Growth,UAE,Low,Users
+S190,AgriTech,500k-2M,Scaling,UK,Low,Revenue
+S191,FinTech,500k-2M,Growth,Saudi Arabia,Low,Users
+S192,EdTech,100k-500k,Scaling,Pakistan,Medium,Revenue
+S193,FinTech,500k-2M,Idea,India,High,None
+S194,AI,50k-200k,Early Traction,UAE,Medium,Users
+S195,LogisticsTech,2M-10M,MVP,Saudi Arabia,High,Users
+S196,E-commerce,10k-100k,Scaling,UK,Low,Revenue
+S197,LogisticsTech,50k-200k,Early Traction,India,Medium,Users
+S198,AI,50k-200k,Early Traction,Turkey,High,Users
+S199,E-commerce,10k-100k,Early Traction,UAE,High,Users
+S200,SaaS,500k-2M,Growth,USA,Medium,Revenue
+S201,LogisticsTech,2M-10M,MVP,Pakistan,Medium,Users
+S202,AI,500k-2M,Idea,Bangladesh,High,None
+S203,AgriTech,10k-100k,Growth,India,Low,Users
+S204,SaaS,100k-500k,MVP,Turkey,Medium,Users
+S205,PropTech,100k-500k,Scaling,Nigeria,Medium,Revenue
+S206,SaaS,50k-200k,Scaling,Bangladesh,Medium,Revenue
+S207,CleanTech,500k-2M,Early Traction,Bangladesh,High,Users
+S208,EdTech,100k-500k,Growth,UK,Low,Users
+S209,AgriTech,10k-100k,Idea,India,High,None
+S210,SaaS,50k-200k,Early Traction,Egypt,Medium,Users
+S211,SaaS,100k-500k,Growth,Bangladesh,Medium,Revenue
+S212,PropTech,100k-500k,Early Traction,India,Medium,Users
+S213,AgriTech,10k-100k,MVP,USA,Medium,None
+S214,HealthTech,50k-200k,Scaling,Bangladesh,Low,Revenue
+S215,AI,100k-500k,MVP,UK,Medium,Users
+S216,AI,50k-200k,MVP,Turkey,Medium,None
+S217,E-commerce,10k-100k,Idea,Egypt,High,None
+S218,CleanTech,100k-500k,Growth,UAE,Low,Revenue
+S219,EdTech,2M-10M,Scaling,India,Low,Revenue
+S220,E-commerce,10k-100k,Scaling,India,Medium,Revenue
+S221,CleanTech,2M-10M,Growth,Nigeria,Low,Revenue
+S222,FinTech,10k-100k,Scaling,USA,Medium,Revenue
+S223,HealthTech,500k-2M,Scaling,Egypt,Medium,Revenue
+S224,FinTech,2M-10M,Growth,Pakistan,Medium,Users
+S225,HealthTech,50k-200k,MVP,UK,Medium,Users
+S226,SaaS,500k-2M,Idea,Bangladesh,High,None
+S227,CleanTech,50k-200k,Scaling,Egypt,Medium,Revenue
+S228,CleanTech,500k-2M,Idea,Pakistan,High,None
+S229,EdTech,500k-2M,Scaling,Turkey,Medium,Revenue
+S230,HealthTech,500k-2M,Idea,Pakistan,High,None
+S231,PropTech,100k-500k,Growth,India,Low,Users
+S232,FinTech,2M-10M,Growth,Bangladesh,Medium,Revenue
+S233,HealthTech,50k-200k,Early Traction,USA,Medium,Users
+S234,LogisticsTech,2M-10M,Idea,Egypt,High,None
+S235,EdTech,50k-200k,MVP,India,High,Users
+S236,FinTech,2M-10M,MVP,UAE,High,None
+S237,AgriTech,2M-10M,Growth,Turkey,Low,Revenue
+S238,EdTech,500k-2M,MVP,India,Medium,Users
+S239,HealthTech,2M-10M,Early Traction,Pakistan,High,Users
+S240,HealthTech,500k-2M,Growth,Pakistan,Medium,Revenue
+S241,HealthTech,10k-100k,Idea,Turkey,High,None
+S242,PropTech,10k-100k,Scaling,Nigeria,Low,Revenue
+S243,PropTech,2M-10M,Growth,UAE,Medium,Revenue
+S244,SaaS,10k-100k,Early Traction,Egypt,Medium,Users
+S245,FinTech,500k-2M,Growth,Egypt,Medium,Revenue
+S246,EdTech,500k-2M,Early Traction,Bangladesh,High,Users
+S247,EdTech,100k-500k,Idea,India,High,None
+S248,HealthTech,50k-200k,Scaling,USA,Low,Revenue
+S249,EdTech,500k-2M,Early Traction,UAE,Medium,Users
+S250,LogisticsTech,100k-500k,Growth,UAE,Medium,Revenue
+S251,LogisticsTech,10k-100k,Early Traction,USA,High,Users
+S252,FinTech,500k-2M,Early Traction,Saudi Arabia,Medium,Users
+S253,E-commerce,100k-500k,Idea,India,High,None
+S254,PropTech,2M-10M,MVP,Bangladesh,High,None
+S255,E-commerce,50k-200k,Scaling,Nigeria,Low,Revenue
+S256,EdTech,500k-2M,MVP,Turkey,Medium,Users
+S257,FinTech,50k-200k,Scaling,UK,Medium,Revenue
+S258,EdTech,500k-2M,Scaling,Nigeria,Medium,Revenue
+S259,LogisticsTech,500k-2M,Scaling,UAE,Low,Revenue
+S260,HealthTech,500k-2M,Idea,USA,High,None
+S261,HealthTech,50k-200k,Idea,UK,High,None
+S262,CleanTech,50k-200k,Idea,Nigeria,High,None
+S263,CleanTech,500k-2M,Idea,Egypt,High,None
+S264,CleanTech,100k-500k,Idea,Saudi Arabia,High,None
+S265,SaaS,50k-200k,Early Traction,UAE,Medium,Users
+S266,AgriTech,500k-2M,MVP,Nigeria,High,None
+S267,AI,50k-200k,Early Traction,UAE,High,Users
+S268,HealthTech,100k-500k,MVP,India,High,None
+S269,CleanTech,500k-2M,Scaling,India,Low,Revenue
+S270,PropTech,10k-100k,Scaling,Egypt,Low,Revenue
+S271,HealthTech,10k-100k,Growth,Turkey,Low,Users
+S272,PropTech,50k-200k,Growth,India,Low,Users
+S273,LogisticsTech,2M-10M,Scaling,Egypt,Low,Revenue
+S274,AgriTech,500k-2M,Idea,USA,High,None
+S275,EdTech,100k-500k,Idea,Saudi Arabia,High,None
+S276,E-commerce,100k-500k,Idea,Egypt,High,None
+S277,AgriTech,50k-200k,Growth,UAE,Medium,Revenue
+S278,AI,50k-200k,Early Traction,Pakistan,Medium,Users
+S279,EdTech,2M-10M,Early Traction,Bangladesh,High,Users
+S280,AI,100k-500k,MVP,USA,High,Users
+S281,HealthTech,100k-500k,Idea,Bangladesh,High,None
+S282,CleanTech,50k-200k,Early Traction,Nigeria,High,Users
+S283,LogisticsTech,10k-100k,Early Traction,Bangladesh,Medium,Users
+S284,PropTech,2M-10M,MVP,UK,Medium,None
+S285,SaaS,100k-500k,Early Traction,UK,High,Users
+S286,E-commerce,100k-500k,Growth,Nigeria,Medium,Revenue
+S287,PropTech,100k-500k,Growth,Pakistan,Medium,Revenue
+S288,EdTech,50k-200k,Scaling,Pakistan,Low,Revenue
+S289,AI,10k-100k,MVP,Saudi Arabia,Medium,Users
+S290,CleanTech,10k-100k,Scaling,Turkey,Low,Revenue
+S291,EdTech,500k-2M,Early Traction,India,Medium,Users
+S292,CleanTech,100k-500k,Early Traction,Saudi Arabia,Medium,Users
+S293,E-commerce,2M-10M,Growth,Bangladesh,Medium,Revenue
+S294,HealthTech,50k-200k,Growth,Turkey,Low,Revenue
+S295,FinTech,50k-200k,Idea,India,High,None
+S296,AgriTech,100k-500k,Idea,USA,High,None
+S297,HealthTech,50k-200k,MVP,USA,High,None
+S298,FinTech,50k-200k,MVP,Nigeria,High,Users
+S299,LogisticsTech,100k-500k,Scaling,Nigeria,Low,Revenue
+S300,SaaS,500k-2M,Early Traction,Nigeria,High,Users
+S301,PropTech,50k-200k,Idea,USA,High,None
+S302,AgriTech,100k-500k,Scaling,UAE,Low,Revenue
+S303,CleanTech,10k-100k,Scaling,India,Low,Revenue
+S304,E-commerce,100k-500k,MVP,Saudi Arabia,Medium,Users
+S305,SaaS,50k-200k,Early Traction,Egypt,High,Users
+S306,HealthTech,2M-10M,Scaling,India,Low,Revenue
+S307,E-commerce,2M-10M,Scaling,USA,Low,Revenue
+S308,SaaS,2M-10M,Idea,UK,High,None
+S309,PropTech,500k-2M,Idea,Egypt,High,None
+S310,AgriTech,500k-2M,MVP,UK,Medium,None
+S311,AI,500k-2M,MVP,Bangladesh,Medium,Users
+S312,FinTech,2M-10M,Early Traction,UAE,High,Users
+S313,EdTech,50k-200k,Growth,USA,Medium,Revenue
+S314,FinTech,10k-100k,Growth,UK,Low,Users
+S315,E-commerce,10k-100k,Idea,UK,High,None
+S316,FinTech,100k-500k,MVP,Turkey,Medium,None
+S317,E-commerce,2M-10M,Growth,Nigeria,Low,Revenue
+S318,AgriTech,10k-100k,Idea,Bangladesh,High,None
+S319,FinTech,100k-500k,Scaling,Pakistan,Low,Revenue
+S320,AgriTech,500k-2M,Scaling,UK,Low,Revenue
+S321,CleanTech,100k-500k,MVP,USA,Medium,Users
+S322,AI,10k-100k,Growth,Turkey,Medium,Revenue
+S323,LogisticsTech,10k-100k,Early Traction,Bangladesh,High,Users
+S324,PropTech,10k-100k,Scaling,UAE,Low,Revenue
+S325,EdTech,2M-10M,Early Traction,USA,Medium,Users
+S326,PropTech,500k-2M,Scaling,Egypt,Low,Revenue
+S327,AI,100k-500k,MVP,Nigeria,Medium,None
+S328,PropTech,50k-200k,Scaling,USA,Medium,Revenue
+S329,CleanTech,100k-500k,Scaling,Turkey,Medium,Revenue
+S330,PropTech,500k-2M,Early Traction,Pakistan,High,Users
+S331,SaaS,2M-10M,Growth,UK,Medium,Revenue
+S332,HealthTech,2M-10M,Scaling,Saudi Arabia,Low,Revenue
+S333,E-commerce,2M-10M,Scaling,Bangladesh,Low,Revenue
+S334,AI,10k-100k,Scaling,Saudi Arabia,Low,Revenue
+S335,EdTech,50k-200k,Growth,Bangladesh,Medium,Revenue
+S336,LogisticsTech,500k-2M,Scaling,Pakistan,Low,Revenue
+S337,LogisticsTech,500k-2M,Early Traction,Egypt,High,Users
+S338,E-commerce,2M-10M,Growth,USA,Low,Revenue
+S339,PropTech,50k-200k,Growth,Saudi Arabia,Low,Revenue
+S340,FinTech,100k-500k,Early Traction,Saudi Arabia,High,Users
+S341,AgriTech,2M-10M,Early Traction,UK,High,Users
+S342,PropTech,500k-2M,Scaling,Bangladesh,Medium,Revenue
+S343,HealthTech,100k-500k,Idea,India,High,None
+S344,HealthTech,50k-200k,Growth,Saudi Arabia,Low,Revenue
+S345,E-commerce,2M-10M,Idea,Turkey,High,None
+S346,AI,50k-200k,Scaling,Saudi Arabia,Low,Revenue
+S347,CleanTech,500k-2M,Early Traction,India,Medium,Users
+S348,LogisticsTech,500k-2M,MVP,Nigeria,Medium,None
+S349,HealthTech,100k-500k,Early Traction,Pakistan,Medium,Users
+S350,LogisticsTech,50k-200k,Idea,Bangladesh,High,None
+S351,CleanTech,50k-200k,Growth,UK,Medium,Users
+S352,HealthTech,2M-10M,Scaling,India,Medium,Revenue
+S353,AgriTech,2M-10M,Scaling,Nigeria,Low,Revenue
+S354,HealthTech,10k-100k,MVP,USA,High,Users
+S355,HealthTech,10k-100k,MVP,USA,Medium,None
+S356,E-commerce,500k-2M,Scaling,Bangladesh,Medium,Revenue
+S357,CleanTech,50k-200k,Idea,UAE,High,None
+S358,FinTech,100k-500k,Idea,Bangladesh,High,None
+S359,HealthTech,100k-500k,Early Traction,Turkey,Medium,Users
+S360,EdTech,10k-100k,MVP,India,Medium,Users
+S361,E-commerce,2M-10M,Growth,UK,Medium,Revenue
+S362,EdTech,50k-200k,Scaling,Saudi Arabia,Low,Revenue
+S363,E-commerce,2M-10M,Growth,USA,Low,Revenue
+S364,LogisticsTech,50k-200k,MVP,Turkey,High,Users
+S365,LogisticsTech,10k-100k,Early Traction,Turkey,Medium,Users
+S366,LogisticsTech,50k-200k,Scaling,Turkey,Low,Revenue
+S367,EdTech,500k-2M,Scaling,India,Low,Revenue
+S368,SaaS,500k-2M,Scaling,Pakistan,Medium,Revenue
+S369,LogisticsTech,500k-2M,Growth,Turkey,Medium,Revenue
+S370,HealthTech,500k-2M,Idea,UK,High,None
+S371,PropTech,10k-100k,Idea,Bangladesh,High,None
+S372,LogisticsTech,10k-100k,Idea,Nigeria,High,None
+S373,CleanTech,50k-200k,MVP,Bangladesh,Medium,Users
+S374,AgriTech,500k-2M,Growth,India,Medium,Revenue
+S375,SaaS,2M-10M,MVP,Bangladesh,High,None
+S376,AI,100k-500k,Idea,Nigeria,High,None
+S377,FinTech,500k-2M,MVP,USA,High,Users
+S378,FinTech,10k-100k,Idea,Bangladesh,High,None
+S379,FinTech,10k-100k,Idea,Turkey,High,None
+S380,PropTech,50k-200k,Idea,Pakistan,High,None
+S381,FinTech,50k-200k,Scaling,Pakistan,Low,Revenue
+S382,FinTech,100k-500k,Scaling,Turkey,Medium,Revenue
+S383,HealthTech,2M-10M,MVP,Saudi Arabia,Medium,Users
+S384,HealthTech,2M-10M,Idea,Turkey,High,None
+S385,LogisticsTech,10k-100k,Growth,USA,Low,Revenue
+S386,CleanTech,50k-200k,Growth,UK,Low,Users
+S387,LogisticsTech,50k-200k,Growth,Saudi Arabia,Low,Users
+S388,AgriTech,2M-10M,Idea,Bangladesh,High,None
+S389,CleanTech,100k-500k,MVP,Saudi Arabia,Medium,None
+S390,AgriTech,10k-100k,Early Traction,Egypt,Medium,Users
+S391,HealthTech,2M-10M,Growth,Turkey,Medium,Users
+S392,FinTech,2M-10M,Scaling,Saudi Arabia,Medium,Revenue
+S393,EdTech,10k-100k,Early Traction,Saudi Arabia,Medium,Users
+S394,AgriTech,2M-10M,MVP,Saudi Arabia,Medium,None
+S395,LogisticsTech,100k-500k,Early Traction,Bangladesh,High,Users
+S396,HealthTech,100k-500k,Early Traction,Egypt,High,Users
+S397,SaaS,100k-500k,Growth,Saudi Arabia,Low,Revenue
+S398,CleanTech,2M-10M,Idea,Saudi Arabia,High,None
+S399,HealthTech,2M-10M,Scaling,Turkey,Medium,Revenue
+S400,E-commerce,100k-500k,MVP,Saudi Arabia,Medium,None
+S401,AgriTech,100k-500k,Scaling,UK,Medium,Revenue
+S402,AgriTech,100k-500k,MVP,UAE,High,Users
+S403,E-commerce,10k-100k,Scaling,Egypt,Low,Revenue
+S404,AI,500k-2M,Idea,UAE,High,None
+S405,E-commerce,50k-200k,Idea,Egypt,High,None
+S406,AI,2M-10M,Scaling,Nigeria,Medium,Revenue
+S407,AI,2M-10M,Scaling,Bangladesh,Low,Revenue
+S408,LogisticsTech,2M-10M,Early Traction,UK,Medium,Users
+S409,E-commerce,10k-100k,Idea,Egypt,High,None
+S410,FinTech,2M-10M,Scaling,UK,Medium,Revenue
+S411,CleanTech,100k-500k,Idea,Bangladesh,High,None
+S412,FinTech,10k-100k,Early Traction,Pakistan,Medium,Users
+S413,CleanTech,2M-10M,Growth,Nigeria,Medium,Users
+S414,E-commerce,500k-2M,Idea,Bangladesh,High,None
+S415,LogisticsTech,50k-200k,Idea,Saudi Arabia,High,None
+S416,AI,100k-500k,Idea,Egypt,High,None
+S417,EdTech,50k-200k,Idea,Turkey,High,None
+S418,SaaS,50k-200k,Early Traction,Turkey,Medium,Users
+S419,LogisticsTech,500k-2M,Early Traction,UAE,Medium,Users
+S420,AI,500k-2M,Idea,Saudi Arabia,High,None
+S421,PropTech,2M-10M,Scaling,Bangladesh,Medium,Revenue
+S422,HealthTech,500k-2M,Growth,Saudi Arabia,Low,Revenue
+S423,CleanTech,2M-10M,MVP,Bangladesh,High,Users
+S424,FinTech,10k-100k,Idea,UK,High,None
+S425,E-commerce,100k-500k,Growth,USA,Medium,Users
+S426,AI,500k-2M,Early Traction,USA,High,Users
+S427,E-commerce,50k-200k,Idea,Bangladesh,High,None
+S428,SaaS,10k-100k,Idea,USA,High,None
+S429,CleanTech,100k-500k,Idea,Bangladesh,High,None
+S430,LogisticsTech,2M-10M,MVP,Egypt,High,Users
+S431,E-commerce,100k-500k,MVP,UK,Medium,Users
+S432,E-commerce,50k-200k,Idea,Bangladesh,High,None
+S433,HealthTech,10k-100k,Growth,USA,Low,Users
+S434,AgriTech,2M-10M,Scaling,Saudi Arabia,Medium,Revenue
+S435,E-commerce,10k-100k,Early Traction,Bangladesh,High,Users
+S436,EdTech,100k-500k,Growth,Bangladesh,Medium,Revenue
+S437,EdTech,50k-200k,Scaling,Nigeria,Medium,Revenue
+S438,CleanTech,100k-500k,Early Traction,Nigeria,Medium,Users
+S439,CleanTech,500k-2M,Early Traction,USA,Medium,Users
+S440,PropTech,50k-200k,Scaling,Egypt,Low,Revenue
+S441,FinTech,100k-500k,Growth,India,Low,Revenue
+S442,E-commerce,50k-200k,Early Traction,UK,Medium,Users
+S443,CleanTech,500k-2M,Idea,Turkey,High,None
+S444,LogisticsTech,500k-2M,Scaling,Egypt,Low,Revenue
+S445,LogisticsTech,10k-100k,Scaling,India,Low,Revenue
+S446,E-commerce,10k-100k,Scaling,Turkey,Medium,Revenue
+S447,CleanTech,10k-100k,Idea,India,High,None
+S448,LogisticsTech,2M-10M,Scaling,Turkey,Low,Revenue
+S449,EdTech,500k-2M,Growth,Turkey,Medium,Revenue
+S450,AI,10k-100k,Growth,UK,Low,Users
+S451,SaaS,100k-500k,MVP,UK,Medium,Users
+S452,FinTech,500k-2M,Scaling,USA,Medium,Revenue
+S453,AgriTech,100k-500k,Growth,India,Low,Users
+S454,SaaS,100k-500k,Idea,India,High,None
+S455,LogisticsTech,2M-10M,MVP,UAE,Medium,Users
+S456,AgriTech,500k-2M,MVP,UAE,High,Users
+S457,CleanTech,2M-10M,Idea,Saudi Arabia,High,None
+S458,CleanTech,50k-200k,Idea,Saudi Arabia,High,None
+S459,PropTech,2M-10M,Idea,UAE,High,None
+S460,FinTech,10k-100k,Growth,UK,Low,Revenue
+S461,PropTech,2M-10M,Growth,Bangladesh,Medium,Revenue
+S462,EdTech,2M-10M,Growth,UAE,Low,Users
+S463,E-commerce,10k-100k,Early Traction,Saudi Arabia,High,Users
+S464,E-commerce,50k-200k,Early Traction,Egypt,High,Users
+S465,PropTech,2M-10M,MVP,Bangladesh,Medium,None
+S466,AgriTech,50k-200k,Scaling,Egypt,Low,Revenue
+S467,HealthTech,50k-200k,MVP,USA,Medium,None
+S468,EdTech,500k-2M,Idea,UAE,High,None
+S469,LogisticsTech,500k-2M,Scaling,Bangladesh,Medium,Revenue
+S470,AgriTech,50k-200k,Growth,India,Medium,Users
+S471,HealthTech,100k-500k,Idea,Saudi Arabia,High,None
+S472,AgriTech,500k-2M,Scaling,Egypt,Low,Revenue
+S473,HealthTech,100k-500k,Scaling,Egypt,Low,Revenue
+S474,LogisticsTech,500k-2M,MVP,India,High,Users
+S475,AI,100k-500k,Growth,USA,Medium,Revenue
+S476,SaaS,50k-200k,MVP,Turkey,Medium,Users
+S477,E-commerce,50k-200k,Scaling,Saudi Arabia,Low,Revenue
+S478,PropTech,2M-10M,Early Traction,UK,Medium,Users
+S479,HealthTech,2M-10M,Early Traction,UK,Medium,Users
+S480,CleanTech,100k-500k,Idea,UAE,High,None
+S481,E-commerce,50k-200k,Early Traction,Bangladesh,High,Users
+S482,PropTech,500k-2M,Early Traction,Bangladesh,High,Users
+S483,SaaS,2M-10M,Growth,UK,Low,Revenue
+S484,AgriTech,2M-10M,Early Traction,Pakistan,Medium,Users
+S485,EdTech,2M-10M,Idea,Bangladesh,High,None
+S486,FinTech,100k-500k,Growth,USA,Low,Revenue
+S487,LogisticsTech,50k-200k,Scaling,Turkey,Medium,Revenue
+S488,AI,10k-100k,Idea,Nigeria,High,None
+S489,E-commerce,500k-2M,Growth,Pakistan,Low,Users
+S490,E-commerce,50k-200k,Early Traction,UK,Medium,Users
+S491,HealthTech,100k-500k,Idea,UAE,High,None
+S492,HealthTech,500k-2M,MVP,India,High,None
+S493,FinTech,10k-100k,Growth,UAE,Medium,Revenue
+S494,AI,100k-500k,Idea,India,High,None
+S495,AgriTech,50k-200k,Idea,Bangladesh,High,None
+S496,SaaS,100k-500k,Early Traction,UK,Medium,Users
+S497,E-commerce,10k-100k,MVP,Egypt,High,None
+S498,AgriTech,50k-200k,Early Traction,UAE,High,Users
+S499,FinTech,10k-100k,Idea,UAE,High,None
+S500,EdTech,100k-500k,Growth,UAE,Medium,Revenue
