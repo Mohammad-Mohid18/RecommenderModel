@@ -11,7 +11,6 @@ rule-based positive labels from investor preferences to startup profiles.
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 
 import firebase_admin
@@ -55,13 +54,7 @@ INVESTOR_SNAPSHOT_PATH = DATA_DIR / "firebase_investor_profiles.csv"
 
 def init_firestore():
     if not firebase_admin._apps:
-        import os, json
-
-        firebase_creds_json = os.environ.get("FIREBASE_CREDENTIALS_JSON")
-        if firebase_creds_json:
-            firebase_admin.initialize_app(credentials.Certificate(json.loads(firebase_creds_json)))
-        else:
-            firebase_admin.initialize_app(credentials.Certificate("serviceAccounts.json"))
+        firebase_admin.initialize_app(credentials.Certificate("serviceAccounts.json"))
     return firestore.client()
 
 
