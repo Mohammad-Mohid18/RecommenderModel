@@ -5,8 +5,10 @@ Run with: uvicorn main:app --reload
 """
 
 # ─── Standard library ────────────────────────────────────────────────────────
+import json
 import logging
 import os
+import tempfile
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional
@@ -35,6 +37,29 @@ SERVICE_ACCOUNT_PATH = "serviceAccounts.json"
 FIRESTORE_COLLECTION = "startup_profiles"
 LOCAL_STARTUPS_PATH  = Path(os.getenv("LOCAL_STARTUPS_PATH", "firebase_startup_profiles.csv"))
 USE_FIRESTORE        = os.getenv("USE_FIRESTORE", "0").strip().lower() in {"1", "true", "yes"}
+
+
+def resolve_service_account_path() -> str:
+    """
+    Return a filesystem path to the Firebase service-account JSON.
+
+    - On Railway (or any host without a committed serviceAccounts.json),
+      the JSON content is provided via the FIREBASE_CREDENTIALS_JSON
+      env var. We write it out to a temp file once and return that path,
+      since firebase_admin.credentials.Certificate() needs a file path.
+    - Locally, if that env var isn't set, we fall back to the
+      serviceAccounts.json file sitting next to this script.
+    """
+    creds_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
+    if creds_json:
+        creds_dict = json.loads(creds_json)
+        tmp = tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False, encoding="utf-8"
+        )
+        json.dump(creds_dict, tmp)
+        tmp.close()
+        return tmp.name
+    return SERVICE_ACCOUNT_PATH
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -80,7 +105,8 @@ async def lifespan(app: FastAPI):
     # ── Initialise Firebase (idempotent guard) ──────────────────────────────
     try:
         if not firebase_admin._apps:
-            cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
+            resolved_path = resolve_service_account_path()
+            cred = credentials.Certificate(resolved_path)
             firebase_admin.initialize_app(cred)
             logger.info("✅ Firebase initialised.")
         else:
@@ -89,8 +115,14 @@ async def lifespan(app: FastAPI):
         db = firestore.client()
         logger.info("✅ Firestore client ready.")
     except FileNotFoundError:
-        logger.error("❌ Service account file '%s' not found.", SERVICE_ACCOUNT_PATH)
-        raise RuntimeError(f"Service account file '{SERVICE_ACCOUNT_PATH}' not found.")
+        logger.error(
+            "❌ No Firebase credentials found. Set FIREBASE_CREDENTIALS_JSON "
+            "(deployed) or add serviceAccounts.json (local)."
+        )
+        raise RuntimeError(
+            "Firebase credentials not found: set FIREBASE_CREDENTIALS_JSON "
+            "env var or provide serviceAccounts.json locally."
+        )
     except Exception as exc:
         logger.error("❌ Firebase init failed: %s", exc)
         raise RuntimeError(f"Firebase init error: {exc}") from exc

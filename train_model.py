@@ -11,6 +11,8 @@ rule-based positive labels from investor preferences to startup profiles.
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 from pathlib import Path
 
 import firebase_admin
@@ -52,9 +54,32 @@ STARTUP_SNAPSHOT_PATH = DATA_DIR / "firebase_startup_profiles.csv"
 INVESTOR_SNAPSHOT_PATH = DATA_DIR / "firebase_investor_profiles.csv"
 
 
+def resolve_service_account_path() -> str:
+    """
+    Return a filesystem path to the Firebase service-account JSON.
+
+    - On Railway, the JSON content is provided via the
+      FIREBASE_CREDENTIALS_JSON env var; write it to a temp file since
+      credentials.Certificate() needs a path, not a dict-in-env-var.
+    - Locally, fall back to serviceAccounts.json next to this script.
+    """
+    creds_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
+    if creds_json:
+        creds_dict = json.loads(creds_json)
+        tmp = tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False, encoding="utf-8"
+        )
+        json.dump(creds_dict, tmp)
+        tmp.close()
+        return tmp.name
+    return "serviceAccounts.json"
+
+
 def init_firestore():
     if not firebase_admin._apps:
-        firebase_admin.initialize_app(credentials.Certificate("serviceAccounts.json"))
+        firebase_admin.initialize_app(
+            credentials.Certificate(resolve_service_account_path())
+        )
     return firestore.client()
 
 
