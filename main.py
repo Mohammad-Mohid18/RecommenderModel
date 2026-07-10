@@ -31,7 +31,9 @@ logger = logging.getLogger(__name__)
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 MODEL_PATH           = "startup_investor_pipeline.pkl"
-SERVICE_ACCOUNT_PATH = "serviceAccounts.json"
+import os
+
+SERVICE_ACCOUNT_PATH = os.environ.get("FIREBASE_CRED_PATH", "serviceAccounts.json")
 FIRESTORE_COLLECTION = "startup_profiles"
 LOCAL_STARTUPS_PATH  = Path(os.getenv("LOCAL_STARTUPS_PATH", "firebase_startup_profiles.csv"))
 USE_FIRESTORE        = os.getenv("USE_FIRESTORE", "0").strip().lower() in {"1", "true", "yes"}
