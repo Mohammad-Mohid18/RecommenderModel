@@ -10,11 +10,13 @@ import logging
 import os
 import tempfile
 from contextlib import asynccontextmanager
+from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
 
 # ─── Third-party ─────────────────────────────────────────────────────────────
 import joblib
+import numpy as np
 import pandas as pd
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -275,6 +277,30 @@ def fetch_startups() -> pd.DataFrame:
 # ════════════════════════════════════════════════════════════════════════════
 # CORE RECOMMENDATION LOGIC
 # ════════════════════════════════════════════════════════════════════════════
+def make_json_safe(value):
+    """
+    Recursively convert values that json.dumps can't handle on its own —
+    pandas.Timestamp, Firestore's DatetimeWithNanoseconds, datetime.date,
+    numpy scalars, etc. — into plain JSON-friendly types.
+    """
+    if isinstance(value, dict):
+        return {key: make_json_safe(val) for key, val in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [make_json_safe(item) for item in value]
+    # Covers pandas.Timestamp, datetime.datetime, Firestore's
+    # DatetimeWithNanoseconds (all are datetime.datetime subclasses),
+    # and datetime.date.
+    if isinstance(value, (pd.Timestamp, datetime, date)):
+        return value.isoformat()
+    if isinstance(value, (np.integer,)):
+        return int(value)
+    if isinstance(value, (np.floating,)):
+        return float(value)
+    if pd.isna(value) if not isinstance(value, (list, dict)) else False:
+        return None
+    return value
+
+
 def recommend(
     investor: dict,
     startups: pd.DataFrame,
@@ -352,6 +378,7 @@ async def recommend_endpoint(investor_profile: InvestorProfile):
         .where(pd.notna(top_startups), None)
         .to_dict(orient="records")
     )
+    output = make_json_safe(output)
     logger.info("✅ Returning %d recommendations.", len(output))
 
     return JSONResponse(content={"recommendations": output})
