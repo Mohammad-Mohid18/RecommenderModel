@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 # ─── Config ──────────────────────────────────────────────────────────────────
 MODEL_PATH           = "startup_investor_pipeline.pkl"
 SERVICE_ACCOUNT_PATH = "serviceAccounts.json"
-FIRESTORE_COLLECTION = "startup_profiles"
+FIRESTORE_COLLECTION = "projects"
 LOCAL_STARTUPS_PATH  = Path(os.getenv("LOCAL_STARTUPS_PATH", "firebase_startup_profiles.csv"))
 USE_FIRESTORE        = os.getenv("USE_FIRESTORE", "0").strip().lower() in {"1", "true", "yes"}
 
@@ -83,22 +83,59 @@ _refresh_task = None   # background asyncio task handle
 # ════════════════════════════════════════════════════════════════════════════
 # BACKGROUND JOB — keep the local CSV in sync with Firestore
 # ════════════════════════════════════════════════════════════════════════════
+def map_project_to_startup_features(project_data: Optional[dict], startup_id: Optional[str] = None) -> dict:
+    """Map only the project fields required by the existing recommendation model."""
+    data = project_data or {}
+    return {
+        "startup_id": startup_id or data.get("startup_id", ""),
+        "startup_category": data.get("category", ""),
+        "startup_budget_required": data.get("budget_range", ""),
+        "startup_stage": data.get("projectStage", ""),
+        "startup_location": data.get("location", ""),
+        "startup_risk_level": data.get("risk_level", ""),
+        "startup_traction_level": data.get("traction_level", ""),
+    }
+
+
+def fetch_project_startup_rows() -> list[dict]:
+    """Fetch documents from Firestore's projects collection and map them to model features."""
+    if db is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Firestore client is not initialised."
+        )
+
+    try:
+        docs = db.collection(FIRESTORE_COLLECTION).stream()
+        rows = []
+        for doc in docs:
+            data = doc.to_dict() or {}
+            rows.append(map_project_to_startup_features(data, doc.id))
+        return rows
+    except Exception as exc:
+        logger.error("Firestore read failed: %s", exc)
+        raise HTTPException(
+            status_code=503,
+            detail=f"Could not fetch startups from Firestore: {exc}"
+        )
+
+
 def refresh_startups_csv_once() -> None:
     """
-    Pull every document from Firestore's 'startup_profiles' collection and
-    overwrite the local CSV with it. Blocking (uses the sync Firestore SDK),
-    so it's always called via asyncio.to_thread from the async loop below.
+    Pull every document from Firestore's projects collection and overwrite the
+    local CSV with the mapped startup feature rows. Blocking (uses the sync
+    Firestore SDK), so it's always called via asyncio.to_thread from the async
+    loop below.
     """
     if db is None:
         logger.warning("⏭️  Skipping CSV refresh — Firestore client not initialised.")
         return
 
-    docs = db.collection(FIRESTORE_COLLECTION).stream()
-    rows = []
-    for doc in docs:
-        data = doc.to_dict()
-        data["startup_id"] = doc.id
-        rows.append(data)
+    try:
+        rows = fetch_project_startup_rows()
+    except HTTPException as exc:
+        logger.warning("⏭️  Skipping CSV refresh — %s", exc.detail)
+        return
 
     if not rows:
         logger.warning("⏭️  Firestore returned 0 startup docs — leaving existing CSV untouched.")
@@ -107,7 +144,7 @@ def refresh_startups_csv_once() -> None:
     df = pd.DataFrame(rows)
     df.to_csv(LOCAL_STARTUPS_PATH, index=False)
     logger.info(
-        "🔄 Refreshed '%s' from Firestore — %d startup profiles.",
+        "🔄 Refreshed '%s' from Firestore projects — %d startup rows.",
         LOCAL_STARTUPS_PATH, len(df),
     )
 
@@ -288,8 +325,8 @@ class InvestorProfile(BaseModel):
 # ════════════════════════════════════════════════════════════════════════════
 def fetch_startups() -> pd.DataFrame:
     """
-    Pull every document from the 'startup_profiles' Firestore collection
-    and return a tidy DataFrame.
+    Pull every project document from Firestore and return a tidy DataFrame
+    containing only the fields expected by the existing recommendation model.
 
     Each Firestore document ID is stored in a 'startup_id' column so
     downstream code can reference it without needing the raw doc reference.
@@ -318,25 +355,10 @@ def fetch_startups() -> pd.DataFrame:
                 detail=f"Could not read local startups file: {exc}"
             )
 
-    if db is None:
-        raise HTTPException(
-            status_code=503,
-            detail="Firestore client is not initialised."
-        )
-
     try:
-        docs = db.collection(FIRESTORE_COLLECTION).stream()
-        rows = []
-        for doc in docs:
-            data = doc.to_dict()
-            data["startup_id"] = doc.id   # preserve Firestore document ID
-            rows.append(data)
-    except Exception as exc:
-        logger.error("Firestore read failed: %s", exc)
-        raise HTTPException(
-            status_code=503,
-            detail=f"Could not fetch startups from Firestore: {exc}"
-        )
+        rows = fetch_project_startup_rows()
+    except HTTPException:
+        raise
 
     if not rows:
         raise HTTPException(
@@ -345,7 +367,7 @@ def fetch_startups() -> pd.DataFrame:
         )
 
     startups_df = pd.DataFrame(rows)
-    logger.info("📥 Fetched %d startup profiles from Firestore.", len(startups_df))
+    logger.info("📥 Fetched %d startup rows from Firestore projects.", len(startups_df))
     return startups_df
 
 
@@ -468,7 +490,7 @@ async def health():
     return {
         "status":                   "ok",
         "api_version":              "2.0.0",
-        "recommendation_direction": "investor_to_startups",
+        "recommendation_direction": "startups_to_investor",
         "recommendation_limit":     RECOMMENDATION_TOP_N,
         "model_loaded":             model is not None,
         "data_source":              "firestore" if USE_FIRESTORE else "local_csv",
