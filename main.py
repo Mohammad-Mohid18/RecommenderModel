@@ -5,6 +5,7 @@ Run with: uvicorn main:app --reload
 """
 
 # ─── Standard library ────────────────────────────────────────────────────────
+import asyncio
 import json
 import logging
 import os
@@ -40,6 +41,13 @@ FIRESTORE_COLLECTION = "startup_profiles"
 LOCAL_STARTUPS_PATH  = Path(os.getenv("LOCAL_STARTUPS_PATH", "firebase_startup_profiles.csv"))
 USE_FIRESTORE        = os.getenv("USE_FIRESTORE", "0").strip().lower() in {"1", "true", "yes"}
 
+# Periodic Firestore → CSV sync. This runs in the background regardless of
+# USE_FIRESTORE, so that even when the API serves requests from the local
+# CSV (cheap, no per-request Firestore reads/quota risk), that CSV stays
+# fresh on its own as new users are added in Firestore.
+AUTO_REFRESH_CSV      = os.getenv("AUTO_REFRESH_CSV", "1").strip().lower() in {"1", "true", "yes"}
+CSV_REFRESH_SECONDS   = int(os.getenv("CSV_REFRESH_SECONDS", "600"))  # 10 minutes
+
 
 def resolve_service_account_path() -> str:
     """
@@ -69,6 +77,54 @@ def resolve_service_account_path() -> str:
 # ════════════════════════════════════════════════════════════════════════════
 model    = None   # scikit-learn pipeline
 db       = None   # Firestore client
+_refresh_task = None   # background asyncio task handle
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# BACKGROUND JOB — keep the local CSV in sync with Firestore
+# ════════════════════════════════════════════════════════════════════════════
+def refresh_startups_csv_once() -> None:
+    """
+    Pull every document from Firestore's 'startup_profiles' collection and
+    overwrite the local CSV with it. Blocking (uses the sync Firestore SDK),
+    so it's always called via asyncio.to_thread from the async loop below.
+    """
+    if db is None:
+        logger.warning("⏭️  Skipping CSV refresh — Firestore client not initialised.")
+        return
+
+    docs = db.collection(FIRESTORE_COLLECTION).stream()
+    rows = []
+    for doc in docs:
+        data = doc.to_dict()
+        data["startup_id"] = doc.id
+        rows.append(data)
+
+    if not rows:
+        logger.warning("⏭️  Firestore returned 0 startup docs — leaving existing CSV untouched.")
+        return
+
+    df = pd.DataFrame(rows)
+    df.to_csv(LOCAL_STARTUPS_PATH, index=False)
+    logger.info(
+        "🔄 Refreshed '%s' from Firestore — %d startup profiles.",
+        LOCAL_STARTUPS_PATH, len(df),
+    )
+
+
+async def periodic_csv_refresh_loop():
+    """
+    Runs forever in the background: every CSV_REFRESH_SECONDS, re-pull
+    Firestore and overwrite the local CSV. Any single failure (quota,
+    network, etc.) is logged and skipped — it never crashes the server
+    or blocks request handling, and just retries on the next tick.
+    """
+    while True:
+        await asyncio.sleep(CSV_REFRESH_SECONDS)
+        try:
+            await asyncio.to_thread(refresh_startups_csv_once)
+        except Exception as exc:
+            logger.error("❌ Background CSV refresh failed (will retry next tick): %s", exc)
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -81,7 +137,7 @@ async def lifespan(app: FastAPI):
     when it shuts down.  Heavy initialisation lives here so it is never
     repeated per-request.
     """
-    global model, db
+    global model, db, _refresh_task
 
     # ── Load ML model ───────────────────────────────────────────────────────
     try:
@@ -94,44 +150,63 @@ async def lifespan(app: FastAPI):
         logger.error("❌ Failed to load model: %s", exc)
         raise RuntimeError(f"Model load error: {exc}") from exc
 
-    if not USE_FIRESTORE:
+    # Firebase needs to be initialised if EITHER the API serves requests
+    # straight from Firestore (USE_FIRESTORE=1) OR the background CSV
+    # refresh job needs it (AUTO_REFRESH_CSV=1), even while requests are
+    # served from the cheaper local CSV.
+    if USE_FIRESTORE or AUTO_REFRESH_CSV:
+        try:
+            if not firebase_admin._apps:
+                resolved_path = resolve_service_account_path()
+                cred = credentials.Certificate(resolved_path)
+                firebase_admin.initialize_app(cred)
+                logger.info("✅ Firebase initialised.")
+            else:
+                logger.info("ℹ️  Firebase already initialised — skipping.")
+
+            db = firestore.client()
+            logger.info("✅ Firestore client ready.")
+        except FileNotFoundError:
+            logger.error(
+                "❌ No Firebase credentials found. Set FIREBASE_CREDENTIALS_JSON "
+                "(deployed) or add serviceAccounts.json (local)."
+            )
+            if USE_FIRESTORE:
+                # Serving directly from Firestore with no credentials is fatal.
+                raise RuntimeError(
+                    "Firebase credentials not found: set FIREBASE_CREDENTIALS_JSON "
+                    "env var or provide serviceAccounts.json locally."
+                )
+            # Otherwise just disable the background refresh and keep serving
+            # from whatever CSV is already on disk.
+            db = None
+            logger.warning("⚠️  Auto-refresh disabled for this run — no Firebase credentials.")
+        except Exception as exc:
+            logger.error("❌ Firebase init failed: %s", exc)
+            if USE_FIRESTORE:
+                raise RuntimeError(f"Firebase init error: {exc}") from exc
+            db = None
+    else:
         db = None
         logger.info(
-            "Using local startups file '%s'. Set USE_FIRESTORE=1 to use Firestore.",
+            "Using local startups file '%s'. Set USE_FIRESTORE=1 to serve from "
+            "Firestore directly, or AUTO_REFRESH_CSV=1 to keep this CSV synced.",
             LOCAL_STARTUPS_PATH,
         )
-        yield
-        logger.info("Shutting down - releasing resources.")
-        return
 
-    # ── Initialise Firebase (idempotent guard) ──────────────────────────────
-    try:
-        if not firebase_admin._apps:
-            resolved_path = resolve_service_account_path()
-            cred = credentials.Certificate(resolved_path)
-            firebase_admin.initialize_app(cred)
-            logger.info("✅ Firebase initialised.")
-        else:
-            logger.info("ℹ️  Firebase already initialised — skipping.")
-
-        db = firestore.client()
-        logger.info("✅ Firestore client ready.")
-    except FileNotFoundError:
-        logger.error(
-            "❌ No Firebase credentials found. Set FIREBASE_CREDENTIALS_JSON "
-            "(deployed) or add serviceAccounts.json (local)."
+    # ── Start the background CSV-refresh loop ───────────────────────────────
+    if AUTO_REFRESH_CSV and db is not None:
+        _refresh_task = asyncio.create_task(periodic_csv_refresh_loop())
+        logger.info(
+            "🔁 Background CSV refresh enabled — every %d seconds.",
+            CSV_REFRESH_SECONDS,
         )
-        raise RuntimeError(
-            "Firebase credentials not found: set FIREBASE_CREDENTIALS_JSON "
-            "env var or provide serviceAccounts.json locally."
-        )
-    except Exception as exc:
-        logger.error("❌ Firebase init failed: %s", exc)
-        raise RuntimeError(f"Firebase init error: {exc}") from exc
 
     yield  # ← server is live and handling requests here
 
-    # ── Shutdown cleanup (optional) ─────────────────────────────────────────
+    # ── Shutdown cleanup ─────────────────────────────────────────────────────
+    if _refresh_task is not None:
+        _refresh_task.cancel()
     logger.info("🔒 Shutting down — releasing resources.")
 
 
@@ -398,4 +473,6 @@ async def health():
         "model_loaded":             model is not None,
         "data_source":              "firestore" if USE_FIRESTORE else "local_csv",
         "firestore_ready":          db is not None,
+        "auto_refresh_enabled":     AUTO_REFRESH_CSV and db is not None,
+        "auto_refresh_interval_seconds": CSV_REFRESH_SECONDS if AUTO_REFRESH_CSV else None,
     }
