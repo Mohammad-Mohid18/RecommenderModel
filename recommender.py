@@ -64,28 +64,7 @@ RAW_FEATURES = [
     "investor_traction_preference",
 ]
 
-STARTUP_RENAME = {
-    "category": "startup_category",
-    "budget_required": "startup_budget_required",
-    "budget_range": "startup_budget_required",
-    "budget": "startup_budget_required",
-    "status": "startup_stage",
-    "stage": "startup_stage",
-    "location": "startup_location",
-    "risk_level": "startup_risk_level",
-    "traction_level": "startup_traction_level",
-}
 
-INVESTOR_RENAME = {
-    "category": "investor_category",
-    "budget_range": "investor_budget_range",
-    "budget": "investor_budget_range",
-    "preferred_stage": "investor_preferred_stage",
-    "stage": "investor_preferred_stage",
-    "location": "investor_location",
-    "risk_preference": "investor_risk_preference",
-    "traction_preference": "investor_traction_preference",
-}
 
 
 def _split_stages(value: object) -> set[str]:
@@ -171,20 +150,67 @@ class PairFeatureBuilder(BaseEstimator, TransformerMixin):
         return X
 
 
+STARTUP_ALIAS_GROUPS: dict[str, list[str]] = {
+    "startup_category": ["category"],
+    "startup_budget_required": ["budget_required", "budget_range", "budget"],
+    "startup_stage": ["status", "stage", "projectStage"],
+    "startup_location": ["location"],
+    "startup_risk_level": ["risk_level"],
+    "startup_traction_level": ["traction_level"],
+}
+
+INVESTOR_ALIAS_GROUPS: dict[str, list[str]] = {
+    "investor_category": ["category"],
+    "investor_budget_range": ["budget_range", "budget"],
+    "investor_preferred_stage": ["preferred_stage", "stage"],
+    "investor_location": ["location"],
+    "investor_risk_preference": ["risk_preference", "risk_level"],
+    "investor_traction_preference": ["traction_preference", "traction_level"],
+}
+
+
+def _coalesce_columns(df: pd.DataFrame, alias_groups: dict[str, list[str]]) -> pd.DataFrame:
+    """
+    Build one clean column per canonical feature name, picking the first
+    non-empty value across any of its possible source column names.
+
+    This replaces a plain df.rename(columns=...) approach, which silently
+    produces DUPLICATE column names whenever more than one source column
+    (e.g. both 'budget' and 'budget_range') maps to the same target — a bug
+    that breaks feature selection and effectively zeroes out that feature
+    for every prediction.
+    """
+    df = df.copy()
+
+    def is_blank(series: pd.Series) -> pd.Series:
+        return series.isna() | (series.astype(str).str.strip() == "") | (series.astype(str) == "nan")
+
+    for target, sources in alias_groups.items():
+        existing = [s for s in sources if s in df.columns]
+
+        if not existing:
+            df[target] = ""
+        else:
+            combined = df[existing[0]]
+            for source in existing[1:]:
+                combined = combined.where(~is_blank(combined), df[source])
+            combined = combined.where(~is_blank(combined), "")
+            # Drop original source columns first, so assigning `target` never
+            # collides with (and duplicates) a column of the same name.
+            drop_cols = [s for s in existing if s != target]
+            if drop_cols:
+                df = df.drop(columns=drop_cols)
+            df[target] = combined
+
+    return df
+
+
 def normalize_startups(startups_df: pd.DataFrame) -> pd.DataFrame:
-    startups = startups_df.rename(columns=STARTUP_RENAME)
-    for feature in ["startup_risk_level", "startup_traction_level"]:
-        if feature not in startups.columns:
-            startups[feature] = ""
-    return startups
+    return _coalesce_columns(startups_df, STARTUP_ALIAS_GROUPS)
 
 
 def normalize_investors(investors_df: pd.DataFrame) -> pd.DataFrame:
-    investors = investors_df.rename(columns=INVESTOR_RENAME)
-    for feature in ["investor_risk_preference", "investor_traction_preference"]:
-        if feature not in investors.columns:
-            investors[feature] = ""
-    return investors
+    return _coalesce_columns(investors_df, INVESTOR_ALIAS_GROUPS)
 
 
 def make_rule_based_matches(
