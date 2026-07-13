@@ -2,222 +2,134 @@
   "data_source": "firestore",
   "recommendation_direction": "investor_to_startups",
   "label_source": "rule_based_investor_preferences_from_firestore",
-  "startup_profiles": 519,
-  "investor_profiles": 504,
-  "positive_pairs": 2520,
-  "negative_pairs": 2520,
-  "total_pairs": 5040,
-  "test_size": 1008,
-  "accuracy": 0.9811507936507936,
-  "precision": 0.9801980198019802,
-  "recall": 0.9821428571428571,
-  "f1": 0.981169474727453,
-  "roc_auc": 0.9960120622323003,
-  "average_precision": 0.9953914242177445,
+  "project_profiles": 18,
+  "investor_profiles": 505,
+  "positive_pairs": 2525,
+  "negative_pairs": 2525,
+  "total_pairs": 5050,
+  "test_size": 1010,
+  "accuracy": 0.9099009900990099,
+  "precision": 0.8996138996138996,
+  "recall": 0.9227722772277228,
+  "f1": 0.9110459433040078,
+  "roc_auc": 0.9692030193118322,
+  "average_precision": 0.9668945399285896,
   "confusion_matrix": [
     [
-      494,
-      10
+      453,
+      52
     ],
     [
-      9,
-      495
+      39,
+      466
     ]
   ],
   "classification_report": {
     "0": {
-      "precision": 0.9821073558648111,
-      "recall": 0.9801587301587301,
-      "f1-score": 0.9811320754716981,
-      "support": 504.0
+      "precision": 0.9207317073170732,
+      "recall": 0.897029702970297,
+      "f1-score": 0.9087261785356068,
+      "support": 505.0
     },
     "1": {
-      "precision": 0.9801980198019802,
-      "recall": 0.9821428571428571,
-      "f1-score": 0.981169474727453,
-      "support": 504.0
+      "precision": 0.8996138996138996,
+      "recall": 0.9227722772277228,
+      "f1-score": 0.9110459433040078,
+      "support": 505.0
     },
-    "accuracy": 0.9811507936507936,
+    "accuracy": 0.9099009900990099,
     "macro avg": {
-      "precision": 0.9811526878333956,
-      "recall": 0.9811507936507936,
-      "f1-score": 0.9811507750995756,
-      "support": 1008.0
+      "precision": 0.9101728034654863,
+      "recall": 0.9099009900990099,
+      "f1-score": 0.9098860609198073,
+      "support": 1010.0
     },
     "weighted avg": {
-      "precision": 0.9811526878333956,
-      "recall": 0.9811507936507936,
-      "f1-score": 0.9811507750995756,
-      "support": 1008.0
+      "precision": 0.9101728034654865,
+      "recall": 0.9099009900990099,
+      "f1-score": 0.9098860609198073,
+      "support": 1010.0
     }
   },
   "score_stats_test": {
-    "min": 1.9645835335854972e-08,
-    "max": 0.9999426869590811,
-    "mean": 0.4942296329453522,
-    "median": 0.5843715745075395
+    "min": 2.3794773220631403e-06,
+    "max": 0.9999998408154287,
+    "mean": 0.50490203804932,
+    "median": 0.5404407931772086
   },
   "sample_investor_id": "I1",
   "sample_recommendation_scores": [
     {
-      "startup_id": "S210",
-      "match_score": 0.9999
-    },
-    {
-      "startup_id": "S305",
-      "match_score": 0.9999
-    },
-    {
-      "startup_id": "S244",
-      "match_score": 0.9997
-    },
-    {
-      "startup_id": "S418",
-      "match_score": 0.9981
-    },
-    {
-      "startup_id": "S265",
-      "match_score": 0.9981
-    },
-    {
-      "startup_id": "S285",
-      "match_score": 0.9929
-    },
-    {
-      "startup_id": "S496",
-      "match_score": 0.9922
-    },
-    {
-      "startup_id": "S145",
-      "match_score": 0.9919
-    },
-    {
-      "startup_id": "S58",
-      "match_score": 0.9847
-    },
-    {
-      "startup_id": "S21",
-      "match_score": 0.9411
-    },
-    {
-      "startup_id": "S110",
-      "match_score": 0.9297
-    },
-    {
-      "startup_id": "S182",
-      "match_score": 0.9247
-    },
-    {
-      "startup_id": "S300",
-      "match_score": 0.9231
-    },
-    {
-      "startup_id": "S61",
-      "match_score": 0.792
-    },
-    {
-      "startup_id": "S206",
-      "match_score": 0.7618
-    },
-    {
-      "startup_id": "S53",
-      "match_score": 0.7469
-    },
-    {
-      "startup_id": "S9",
-      "match_score": 0.7362
-    },
-    {
-      "startup_id": "S476",
-      "match_score": 0.7293
-    },
-    {
-      "startup_id": "S119",
-      "match_score": 0.6845
-    },
-    {
-      "startup_id": "S82",
-      "match_score": 0.6031
-    },
-    {
-      "startup_id": "S464",
-      "match_score": 0.4805
-    },
-    {
-      "startup_id": "S2",
-      "match_score": 0.4675
-    },
-    {
-      "startup_id": "S18",
-      "match_score": 0.4604
-    },
-    {
-      "startup_id": "S428",
-      "match_score": 0.4535
-    },
-    {
-      "startup_id": "S211",
-      "match_score": 0.4107
-    },
-    {
-      "startup_id": "S32",
-      "match_score": 0.4054
-    },
-    {
-      "startup_id": "S454",
-      "match_score": 0.4054
-    },
-    {
-      "startup_id": "S451",
-      "match_score": 0.3983
-    },
-    {
-      "startup_id": "S204",
-      "match_score": 0.3956
-    },
-    {
       "startup_id": "8bvklkEYFdcWqXaxsfVB",
-      "match_score": 0.3785
-    },
-    {
-      "startup_id": "S1",
-      "match_score": 0.3561
-    },
-    {
-      "startup_id": "S397",
-      "match_score": 0.3209
-    },
-    {
-      "startup_id": "S186",
-      "match_score": 0.3109
-    },
-    {
-      "startup_id": "S390",
-      "match_score": 0.2733
-    },
-    {
-      "startup_id": "S10",
-      "match_score": 0.2172
-    },
-    {
-      "startup_id": "BOwU5kK2aNQSH5kPcdVIfnnoL6D2",
-      "match_score": 0.2001
+      "match_score": 0.9998
     },
     {
       "startup_id": "LsPGIh0YInHBgE6CkdI2",
-      "match_score": 0.2001
+      "match_score": 0.9996
     },
     {
-      "startup_id": "XA7HzZIphEgOxuMtIQwl",
-      "match_score": 0.2001
+      "startup_id": "VcyMspBjj4Lij97s8iyd",
+      "match_score": 0.9926
     },
     {
-      "startup_id": "S396",
-      "match_score": 0.1684
+      "startup_id": "RnCq8QQ4A1x1jjsk2QNQ",
+      "match_score": 0.8109
     },
     {
-      "startup_id": "S368",
-      "match_score": 0.0996
+      "startup_id": "3mhAupMtT2rUsRE8xpbt",
+      "match_score": 0.8075
+    },
+    {
+      "startup_id": "J1xIZceKmoo8sY4QAalj",
+      "match_score": 0.647
+    },
+    {
+      "startup_id": "rhm17rZeXVAHUisobeEM",
+      "match_score": 0.4222
+    },
+    {
+      "startup_id": "oQLukJGHGGBqj3QKCro0",
+      "match_score": 0.3746
+    },
+    {
+      "startup_id": "vaQtR7Nz2PnAudlq2qnt",
+      "match_score": 0.1909
+    },
+    {
+      "startup_id": "9WgIeytvE3kBNiDRnBj8",
+      "match_score": 0.1656
+    },
+    {
+      "startup_id": "S2CfLrt2jtgmiQB3NU7Q",
+      "match_score": 0.1032
+    },
+    {
+      "startup_id": "GUgRYiBIN094eUkqwA0r",
+      "match_score": 0.0846
+    },
+    {
+      "startup_id": "BkYBKY272QrSuN3kkocO",
+      "match_score": 0.0809
+    },
+    {
+      "startup_id": "UjxjDZxZ5RgQnEXMpzKr",
+      "match_score": 0.06
+    },
+    {
+      "startup_id": "zgCxnmazw0G2T0jsNqyD",
+      "match_score": 0.0146
+    },
+    {
+      "startup_id": "La7XOi9oflVspQb6uRUG",
+      "match_score": 0.0116
+    },
+    {
+      "startup_id": "PsCAnx9hi3uNBSIyGEpz",
+      "match_score": 0.0088
+    },
+    {
+      "startup_id": "t9K6uIH3RBJsNQuv5qaU",
+      "match_score": 0.0009
     }
   ]
 }
