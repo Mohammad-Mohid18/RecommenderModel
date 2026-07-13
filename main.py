@@ -168,6 +168,8 @@ def refresh_startups_csv_once() -> None:
     Firestore SDK), so it's always called via asyncio.to_thread from the async
     loop below.
     """
+    import csv
+    
     if db is None:
         logger.warning("⏭️  Skipping CSV refresh — Firestore client not initialised.")
         return
@@ -185,7 +187,9 @@ def refresh_startups_csv_once() -> None:
         logger.info("🔄 Refreshed '%s' from Firestore project — %d startup rows.", LOCAL_STARTUPS_PATH, len(df))
 
     LOCAL_STARTUPS_PATH.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(LOCAL_STARTUPS_PATH, index=False)
+    # Use QUOTE_ALL to ensure all fields, including complex ones (arrays, JSON),
+    # are properly quoted and don't lose data during round-trip
+    df.to_csv(LOCAL_STARTUPS_PATH, index=False, quoting=csv.QUOTE_ALL, escapechar='\\')
 
 
 async def periodic_csv_refresh_loop():
@@ -387,7 +391,8 @@ def fetch_startups() -> pd.DataFrame:
                     if fallback.exists():
                         local_path = fallback
                         break
-            startups_df = pd.read_csv(local_path)
+            # Use escapechar='\\' to properly parse CSV with QUOTE_ALL
+            startups_df = pd.read_csv(local_path, escapechar='\\')
             logger.info("Loaded %d startup profiles from '%s'.", len(startups_df), local_path)
             return startups_df
         except FileNotFoundError:
