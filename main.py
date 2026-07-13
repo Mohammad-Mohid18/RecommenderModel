@@ -35,8 +35,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-MODEL_PATH           = "startup_investor_pipeline.pkl"
-SERVICE_ACCOUNT_PATH = "serviceAccounts.json"
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "startup_investor_pipeline.pkl"
+SERVICE_ACCOUNT_PATH = BASE_DIR / "serviceAccounts.json"
 FIRESTORE_COLLECTION = "project"
 PROJECT_CSV_COLUMNS = [
     "startup_id",
@@ -47,10 +48,12 @@ PROJECT_CSV_COLUMNS = [
     "startup_risk_level",
     "startup_traction_level",
 ]
+# Keep the full Firestore project document fields in the payload so the app
+# can render project cards with details like name, description, photo, etc.
 LOCAL_PROJECTS_PATH = Path(
     os.getenv("LOCAL_PROJECTS_PATH")
     or os.getenv("LOCAL_STARTUPS_PATH")
-    or "firebase_project_profiles.csv"
+    or str(BASE_DIR / "firebase_project_profiles.csv")
 )
 LOCAL_STARTUPS_PATH = LOCAL_PROJECTS_PATH
 USE_FIRESTORE        = os.getenv("USE_FIRESTORE", "0").strip().lower() in {"1", "true", "yes"}
@@ -90,25 +93,49 @@ def resolve_service_account_path() -> str:
 # GLOBALS  (loaded once at startup, reused across every request)
 # ════════════════════════════════════════════════════════════════════════════
 model    = None   # scikit-learn pipeline
+model_loaded_at = None
+model_source_path = None
 db       = None   # Firestore client
 _refresh_task = None   # background asyncio task handle
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# MODEL LOADING
+# ════════════════════════════════════════════════════════════════════════════
+def load_model(force_reload: bool = False):
+    """Load the trained pipeline from disk, reloading it when the file changes."""
+    global model, model_loaded_at, model_source_path
+
+    if not MODEL_PATH.exists():
+        raise FileNotFoundError(f"Model file '{MODEL_PATH}' not found.")
+
+    current_mtime = MODEL_PATH.stat().st_mtime
+    should_reload = force_reload or model is None or model_loaded_at != current_mtime
+    if not should_reload:
+        return model
+
+    model = joblib.load(MODEL_PATH)
+    model_loaded_at = current_mtime
+    model_source_path = str(MODEL_PATH)
+    logger.info("✅ Model reloaded from '%s'", MODEL_PATH)
+    return model
 
 
 # ════════════════════════════════════════════════════════════════════════════
 # BACKGROUND JOB — keep the local CSV in sync with Firestore
 # ════════════════════════════════════════════════════════════════════════════
 def map_project_to_startup_features(project_data: Optional[dict], startup_id: Optional[str] = None) -> dict:
-    """Map Firestore project documents into the local CSV schema used by the recommender."""
+    """Map Firestore project documents into the recommender schema while preserving the full project payload for the app."""
     data = project_data or {}
-    return {
-        "startup_id": startup_id or data.get("startup_id", ""),
-        "startup_category": data.get("category", ""),
-        "startup_budget_required": data.get("budget_range", ""),
-        "startup_stage": data.get("projectStage", data.get("status", "")),
-        "startup_location": data.get("location", ""),
-        "startup_risk_level": data.get("risk_level", ""),
-        "startup_traction_level": data.get("traction_level", ""),
-    }
+    mapped = dict(data)
+    mapped["startup_id"] = startup_id or data.get("startup_id", "")
+    mapped["startup_category"] = data.get("category", "")
+    mapped["startup_budget_required"] = data.get("budget_range", "")
+    mapped["startup_stage"] = data.get("projectStage", data.get("status", ""))
+    mapped["startup_location"] = data.get("location", "")
+    mapped["startup_risk_level"] = data.get("risk_level", "")
+    mapped["startup_traction_level"] = data.get("traction_level", "")
+    return mapped
 
 
 def fetch_project_startup_rows() -> list[dict]:
@@ -151,7 +178,7 @@ def refresh_startups_csv_once() -> None:
         logger.warning("⏭️  Skipping CSV refresh — %s", exc.detail)
         return
 
-    df = pd.DataFrame(rows, columns=PROJECT_CSV_COLUMNS)
+    df = pd.DataFrame(rows)
     if not rows:
         logger.warning("⏭️  Firestore returned 0 project docs — resetting the local CSV to an empty snapshot.")
     else:
@@ -190,8 +217,7 @@ async def lifespan(app: FastAPI):
 
     # ── Load ML model ───────────────────────────────────────────────────────
     try:
-        model = joblib.load(MODEL_PATH)
-        logger.info("✅ Model loaded from '%s'", MODEL_PATH)
+        load_model(force_reload=True)
     except FileNotFoundError:
         logger.error("❌ Model file '%s' not found. Exiting.", MODEL_PATH)
         raise RuntimeError(f"Model file '{MODEL_PATH}' not found.")
@@ -461,11 +487,14 @@ async def recommend_endpoint(investor_profile: InvestorProfile):
 ```
     """
     # ── Guard: model must be loaded ─────────────────────────────────────────
-    if model is None:
+    try:
+        load_model(force_reload=False)
+    except Exception as exc:
+        logger.error("Model reload failed: %s", exc)
         raise HTTPException(
             status_code=503,
-            detail="ML model is not loaded. Check server startup logs."
-        )
+            detail=f"ML model is not loaded. Check server startup logs: {exc}"
+        ) from exc
 
     # ── Convert Pydantic model → plain dict ─────────────────────────────────
     investor_dict = investor_profile.model_dump()
@@ -499,7 +528,13 @@ async def recommend_endpoint(investor_profile: InvestorProfile):
     output = make_json_safe(output)
     logger.info("✅ Returning %d recommendations.", len(output))
 
-    return JSONResponse(content={"recommendations": output})
+    return JSONResponse(
+        content={
+            "recommendations": output,
+            "projects": output,
+            "count": len(output),
+        }
+    )
 
 
 # ════════════════════════════════════════════════════════════════════════════

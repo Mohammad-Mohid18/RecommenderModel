@@ -182,11 +182,9 @@ def _coalesce_columns(df: pd.DataFrame, alias_groups: dict[str, list[str]]) -> p
     Build one clean column per canonical feature name, picking the first
     non-empty value across any of its possible source column names.
 
-    This replaces a plain df.rename(columns=...) approach, which silently
-    produces DUPLICATE column names whenever more than one source column
-    (e.g. both 'budget' and 'budget_range') maps to the same target — a bug
-    that breaks feature selection and effectively zeroes out that feature
-    for every prediction.
+    This preserves columns that are already in canonical form (for example
+    startup_category from a local CSV snapshot) and only falls back to alias
+    columns when the canonical column is blank.
     """
     df = df.copy()
 
@@ -194,18 +192,20 @@ def _coalesce_columns(df: pd.DataFrame, alias_groups: dict[str, list[str]]) -> p
         return series.isna() | (series.astype(str).str.strip() == "") | (series.astype(str) == "nan")
 
     for target, sources in alias_groups.items():
-        existing = [s for s in sources if s in df.columns]
+        ordered_sources = []
+        if target in df.columns:
+            ordered_sources.append(target)
+        ordered_sources.extend(s for s in sources if s in df.columns and s != target)
 
-        if not existing:
+        if not ordered_sources:
             df[target] = ""
         else:
-            combined = df[existing[0]]
-            for source in existing[1:]:
+            combined = df[ordered_sources[0]]
+            for source in ordered_sources[1:]:
                 combined = combined.where(~is_blank(combined), df[source])
             combined = combined.where(~is_blank(combined), "")
-            # Drop original source columns first, so assigning `target` never
-            # collides with (and duplicates) a column of the same name.
-            drop_cols = [s for s in existing if s != target]
+
+            drop_cols = [s for s in ordered_sources if s != target and s in df.columns]
             if drop_cols:
                 df = df.drop(columns=drop_cols)
             df[target] = combined
