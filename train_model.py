@@ -2,7 +2,7 @@
 
 This script expects:
 - serviceAccounts.json
-- Firestore collections: projects and investor_profiles
+- Firestore collections: project and investor_profiles
 
 If no curated recommended_investors.csv exists, it creates one with
 rule-based positive labels from investor preferences to startup profiles.
@@ -181,11 +181,12 @@ def build_pipeline() -> Pipeline:
 
 def main() -> None:
     db = init_firestore()
-    startups_raw = collection_to_frame(db, "projects", "startup_id")
+    startups_raw = collection_to_frame(db, "project", "startup_id")
     investors_raw = collection_to_frame(db, "investor_profiles", "investor_id")
 
     startups_raw.to_csv(STARTUP_SNAPSHOT_PATH, index=False)
     investors_raw.to_csv(INVESTOR_SNAPSHOT_PATH, index=False)
+    print(f"Saved project snapshot: {STARTUP_SNAPSHOT_PATH}")
 
     startups = normalize_startups(startups_raw)
     investors = normalize_investors(investors_raw)
@@ -243,7 +244,7 @@ def main() -> None:
         "data_source": "firestore",
         "recommendation_direction": "investor_to_startups",
         "label_source": label_source,
-        "startup_profiles": int(len(startups_raw)),
+        "project_profiles": int(len(startups_raw)),
         "investor_profiles": int(len(investors_raw)),
         "positive_pairs": int((pair_dataset["label"] == 1).sum()),
         "negative_pairs": int((pair_dataset["label"] == 0).sum()),

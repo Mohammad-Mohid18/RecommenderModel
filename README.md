@@ -20,7 +20,7 @@ Working pieces:
 - `POST /recommend` returns up to **40** ranked startups with nonzero `match_score` values for an investor profile.
 - `GET /health` reports API version, recommendation direction, recommendation limit, model status, and data source.
 - `GET /` returns a small API index for browser checks.
-- The model trains from Firestore `startup_profiles` and `investor_profiles`.
+- The model trains from Firestore `project` and `investor_profiles`.
 - Evaluation metrics are saved in `model_metrics.json`.
 - Firestore snapshots are saved locally for reproducible development.
 - LAN testing works when Uvicorn binds to `0.0.0.0` on port `8000`.
@@ -54,7 +54,7 @@ Generated/model files:
 
 - `startup_investor_pipeline.pkl` - trained scikit-learn pipeline used by the API.
 - `model_metrics.json` - latest evaluation metrics.
-- `firebase_startup_profiles.csv` - snapshot of Firestore `startup_profiles`.
+- `firebase_project_profiles.csv` - snapshot of Firestore `project`.
 - `firebase_investor_profiles.csv` - snapshot of Firestore `investor_profiles`.
 - `recommended_investors.csv` - generated positive training pairs when no curated
 labels exist.
@@ -90,7 +90,7 @@ Flow:
 
 Firestore collections used:
 
-- `startup_profiles`
+- `project`
 - `investor_profiles`
 
 Checked but empty/missing recommendation-label collections:
@@ -311,7 +311,7 @@ Train from Firebase:
 
 This command:
 
-- reads Firestore `startup_profiles`
+- reads Firestore `project`
 - reads Firestore `investor_profiles`
 - saves local Firebase snapshots
 - creates `recommended_investors.csv` if curated labels are missing
@@ -330,7 +330,7 @@ Remove-Item Env:USE_FIRESTORE -ErrorAction SilentlyContinue
 .\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-In this mode, the API reads startups from `firebase_startup_profiles.csv`.
+In this mode, the API reads startups from `firebase_project_profiles.csv`.
 If that file does not exist, it falls back to `startup2.csv`.
 
 Firestore mode:
@@ -341,7 +341,7 @@ $env:USE_FIRESTORE = "1"
 ```
 
 In this mode, the API loads startups directly from Firestore
-`startup_profiles`.
+`project`.
 
 Do not use `--reload` for this project unless you exclude `.venv`. On Windows,
 the reloader can watch `.venv` and repeatedly restart after notebook packages
@@ -588,7 +588,7 @@ workflow.
 
 It now prefers:
 
-- `firebase_startup_profiles.csv`
+- `firebase_project_profiles.csv`
 - `firebase_investor_profiles.csv`
 - `recommended_investors.csv`
 

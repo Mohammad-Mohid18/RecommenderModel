@@ -37,7 +37,16 @@ logger = logging.getLogger(__name__)
 # ─── Config ──────────────────────────────────────────────────────────────────
 MODEL_PATH           = "startup_investor_pipeline.pkl"
 SERVICE_ACCOUNT_PATH = "serviceAccounts.json"
-FIRESTORE_COLLECTION = "projects"
+FIRESTORE_COLLECTION = "project"
+PROJECT_CSV_COLUMNS = [
+    "startup_id",
+    "startup_category",
+    "startup_budget_required",
+    "startup_stage",
+    "startup_location",
+    "startup_risk_level",
+    "startup_traction_level",
+]
 LOCAL_PROJECTS_PATH = Path(
     os.getenv("LOCAL_PROJECTS_PATH")
     or os.getenv("LOCAL_STARTUPS_PATH")
@@ -89,13 +98,13 @@ _refresh_task = None   # background asyncio task handle
 # BACKGROUND JOB — keep the local CSV in sync with Firestore
 # ════════════════════════════════════════════════════════════════════════════
 def map_project_to_startup_features(project_data: Optional[dict], startup_id: Optional[str] = None) -> dict:
-    """Map only the project fields required by the existing recommendation model."""
+    """Map Firestore project documents into the local CSV schema used by the recommender."""
     data = project_data or {}
     return {
         "startup_id": startup_id or data.get("startup_id", ""),
         "startup_category": data.get("category", ""),
         "startup_budget_required": data.get("budget_range", ""),
-        "startup_stage": data.get("projectStage", ""),
+        "startup_stage": data.get("projectStage", data.get("status", "")),
         "startup_location": data.get("location", ""),
         "startup_risk_level": data.get("risk_level", ""),
         "startup_traction_level": data.get("traction_level", ""),
@@ -103,7 +112,7 @@ def map_project_to_startup_features(project_data: Optional[dict], startup_id: Op
 
 
 def fetch_project_startup_rows() -> list[dict]:
-    """Fetch documents from Firestore's projects collection and map them to model features."""
+    """Fetch documents from Firestore's project collection and map them to model features."""
     if db is None:
         raise HTTPException(
             status_code=503,
@@ -127,7 +136,7 @@ def fetch_project_startup_rows() -> list[dict]:
 
 def refresh_startups_csv_once() -> None:
     """
-    Pull every document from Firestore's projects collection and overwrite the
+    Pull every document from Firestore's project collection and overwrite the
     local CSV with the mapped startup feature rows. Blocking (uses the sync
     Firestore SDK), so it's always called via asyncio.to_thread from the async
     loop below.
@@ -142,17 +151,14 @@ def refresh_startups_csv_once() -> None:
         logger.warning("⏭️  Skipping CSV refresh — %s", exc.detail)
         return
 
+    df = pd.DataFrame(rows, columns=PROJECT_CSV_COLUMNS)
     if not rows:
-        logger.warning("⏭️  Firestore returned 0 startup docs — leaving existing CSV untouched.")
-        return
+        logger.warning("⏭️  Firestore returned 0 project docs — resetting the local CSV to an empty snapshot.")
+    else:
+        logger.info("🔄 Refreshed '%s' from Firestore project — %d startup rows.", LOCAL_STARTUPS_PATH, len(df))
 
-    df = pd.DataFrame(rows)
     LOCAL_STARTUPS_PATH.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(LOCAL_STARTUPS_PATH, index=False)
-    logger.info(
-        "🔄 Refreshed '%s' from Firestore projects — %d startup rows.",
-        LOCAL_STARTUPS_PATH, len(df),
-    )
 
 
 async def periodic_csv_refresh_loop():
@@ -232,7 +238,7 @@ async def lifespan(app: FastAPI):
     else:
         db = None
         logger.info(
-            "Using local startups file '%s'. Set USE_FIRESTORE=1 to serve from "
+            "Using local project file '%s'. Set USE_FIRESTORE=1 to serve from "
             "Firestore directly, or AUTO_REFRESH_CSV=1 to keep this CSV synced.",
             LOCAL_STARTUPS_PATH,
         )
@@ -350,7 +356,7 @@ def fetch_startups() -> pd.DataFrame:
         try:
             local_path = LOCAL_STARTUPS_PATH
             if not local_path.exists():
-                fallback_candidates = [Path("firebase_startup_profiles.csv"), Path("startup2.csv")]
+                fallback_candidates = [LOCAL_PROJECTS_PATH, Path("startup2.csv")]
                 for fallback in fallback_candidates:
                     if fallback.exists():
                         local_path = fallback
