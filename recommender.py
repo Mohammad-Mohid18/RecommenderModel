@@ -9,14 +9,18 @@ import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
-BUDGET_ORDER = ["10k-100k", "50k-200k", "100k-500k", "500k-2M", "2M-10M"]
+BUDGET_ORDER = ["10k-100k", "50k-200k", "100k-500k", "500k-2M", "2M-10M","5M-15M", "15M-50M", "50M-250M"]
 BUDGET_RANK = {label: idx for idx, label in enumerate(BUDGET_ORDER)}
 RECOMMENDATION_TOP_N = 40
 
 BUDGET_ALIASES = {
+    "100k-1m": "100k-500k",
     "500k-1m": "500k-2M",
     "1m-2m": "500k-2M",
     "1m-5m": "2M-10M",
+    "5m-15m": "5M-15M",
+    "15m-50m": "15M-50M",
+    "50m-250m": "50M-250M",
 }
 
 STAGE_ALIASES = {
@@ -29,16 +33,11 @@ STAGE_ALIASES = {
 }
 
 LOCATION_ALIASES = {
-    "karachi": "Pakistan",
-    "lahore": "Pakistan",
-    "islamabad": "Pakistan",
-    "riyadh": "Saudi Arabia",
-    "jeddah": "Saudi Arabia",
-    "dubai": "UAE",
-    "abu dhabi": "UAE",
-    "london": "UK",
-    "new york": "USA",
-    "san francisco": "USA",
+    "peshawar": "Peshawar",
+    "islamabad": "Islamabad",
+    "lahore": "Lahore",
+    "karachi": "Karachi",
+    "faisalabad": "Faisalabad",
 }
 
 TRACTION_ALIASES = {
@@ -81,7 +80,18 @@ def _canonicalize(value: object, aliases: dict[str, str]) -> object:
     if value is None or pd.isna(value):
         return ""
     text = str(value).strip()
+    if not text:
+        return ""
     return aliases.get(text.lower(), text)
+
+
+def _canonicalize_location(value: object) -> object:
+    if value is None or pd.isna(value):
+        return ""
+    text = str(value).strip()
+    if not text:
+        return ""
+    return LOCATION_ALIASES.get(text.lower(), "")
 
 
 def canonicalize_startup_features(startup: dict) -> dict:
@@ -94,9 +104,8 @@ def canonicalize_startup_features(startup: dict) -> dict:
         startup.get("startup_stage", ""),
         STAGE_ALIASES,
     )
-    startup["startup_location"] = _canonicalize(
-        startup.get("startup_location", ""),
-        LOCATION_ALIASES,
+    startup["startup_location"] = _canonicalize_location(
+        startup.get("startup_location", "")
     )
     startup["startup_traction_level"] = _canonicalize(
         startup.get("startup_traction_level", ""),
@@ -111,9 +120,8 @@ def canonicalize_investor_features(investor: dict) -> dict:
         investor.get("investor_budget_range", ""),
         BUDGET_ALIASES,
     )
-    investor["investor_location"] = _canonicalize(
-        investor.get("investor_location", ""),
-        LOCATION_ALIASES,
+    investor["investor_location"] = _canonicalize_location(
+        investor.get("investor_location", "")
     )
     investor["investor_traction_preference"] = _canonicalize(
         investor.get("investor_traction_preference", ""),
@@ -293,7 +301,14 @@ def score_startup_against_investors(
             investors_norm[feature] = ""
 
     scoring_frame = investors_norm[RAW_FEATURES].fillna("")
-    return pd.Series(pipeline.predict_proba(scoring_frame)[:, 1], index=investors_df.index)
+    proba = np.asarray(pipeline.predict_proba(scoring_frame))
+    if proba.ndim == 1:
+        scores = proba
+    elif proba.shape[1] > 1:
+        scores = proba[:, 1]
+    else:
+        scores = proba[:, 0]
+    return pd.Series(scores, index=investors_df.index)
 
 
 def normalize_investor_input(investor: dict) -> dict:
@@ -335,7 +350,14 @@ def score_investor_against_startups(
             startups_norm[feature] = ""
 
     scoring_frame = startups_norm[RAW_FEATURES].fillna("")
-    return pd.Series(pipeline.predict_proba(scoring_frame)[:, 1], index=startups_df.index)
+    proba = np.asarray(pipeline.predict_proba(scoring_frame))
+    if proba.ndim == 1:
+        scores = proba
+    elif proba.shape[1] > 1:
+        scores = proba[:, 1]
+    else:
+        scores = proba[:, 0]
+    return pd.Series(scores, index=startups_df.index)
 
 
 def recommend(

@@ -37,8 +37,13 @@ logger = logging.getLogger(__name__)
 # ─── Config ──────────────────────────────────────────────────────────────────
 MODEL_PATH           = "startup_investor_pipeline.pkl"
 SERVICE_ACCOUNT_PATH = "serviceAccounts.json"
-FIRESTORE_COLLECTION = "project"
-LOCAL_STARTUPS_PATH  = Path(os.getenv("LOCAL_STARTUPS_PATH", "firebase_startup_profiles.csv"))
+FIRESTORE_COLLECTION = "projects"
+LOCAL_PROJECTS_PATH = Path(
+    os.getenv("LOCAL_PROJECTS_PATH")
+    or os.getenv("LOCAL_STARTUPS_PATH")
+    or "firebase_project_profiles.csv"
+)
+LOCAL_STARTUPS_PATH = LOCAL_PROJECTS_PATH
 USE_FIRESTORE        = os.getenv("USE_FIRESTORE", "0").strip().lower() in {"1", "true", "yes"}
 
 # Periodic Firestore → CSV sync. This runs in the background regardless of
@@ -142,6 +147,7 @@ def refresh_startups_csv_once() -> None:
         return
 
     df = pd.DataFrame(rows)
+    LOCAL_STARTUPS_PATH.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(LOCAL_STARTUPS_PATH, index=False)
     logger.info(
         "🔄 Refreshed '%s' from Firestore projects — %d startup rows.",
@@ -230,6 +236,11 @@ async def lifespan(app: FastAPI):
             "Firestore directly, or AUTO_REFRESH_CSV=1 to keep this CSV synced.",
             LOCAL_STARTUPS_PATH,
         )
+
+    # Seed the local project CSV immediately so the API has data even before
+    # the first periodic refresh interval expires.
+    if db is not None:
+        await asyncio.to_thread(refresh_startups_csv_once)
 
     # ── Start the background CSV-refresh loop ───────────────────────────────
     if AUTO_REFRESH_CSV and db is not None:
@@ -338,8 +349,12 @@ def fetch_startups() -> pd.DataFrame:
     if not USE_FIRESTORE:
         try:
             local_path = LOCAL_STARTUPS_PATH
-            if not local_path.exists() and local_path.name != "startup2.csv":
-                local_path = Path("startup2.csv")
+            if not local_path.exists():
+                fallback_candidates = [Path("firebase_startup_profiles.csv"), Path("startup2.csv")]
+                for fallback in fallback_candidates:
+                    if fallback.exists():
+                        local_path = fallback
+                        break
             startups_df = pd.read_csv(local_path)
             logger.info("Loaded %d startup profiles from '%s'.", len(startups_df), local_path)
             return startups_df
