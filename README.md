@@ -1,309 +1,305 @@
 # Investor-Startup Recommendation API
 
-This project contains a machine-learning recommendation system that ranks
-startups for an investor profile based on the investor's preferences. It includes:
+A machine-learning recommendation system that ranks startup projects for an
+investor profile based on compatibility. Built with scikit-learn, Firebase
+Firestore, and FastAPI.
 
-- a reusable scikit-learn model pipeline
-- Firebase/Firestore data loading
-- local CSV fallback data
-- a FastAPI backend
-- a notebook for exploration/retraining
-- React Native integration-ready API endpoints
-
-The current API has been tested end to end in both local CSV mode and Firestore
-mode.
+---
 
 ## Current Status
 
-Working pieces:
+### ✅ Working
 
-- `POST /recommend` returns up to **40** ranked startups with nonzero `match_score` values for an investor profile.
-- `GET /health` reports API version, recommendation direction, recommendation limit, model status, and data source.
+- `POST /recommend` returns up to **40** ranked startups with realistic,
+  non-zero `match_score` values for any investor profile.
+- All project details (name, description, photo, images, location, etc.) are
+  preserved in the API response and local CSV.
+- Data is sourced directly from the Firestore **`project`** collection — no
+  manually maintained startup CSV required.
+- A local snapshot `firebase_project_profiles.csv` is written on startup and
+  refreshed automatically every 10 minutes in the background.
+- The model **auto-reloads** when the pipeline file is updated, so retraining
+  immediately affects live recommendations without a server restart.
+- `GET /health` reports full server state: model status, data source, CSV row
+  count, Firestore connection, and refresh interval.
 - `GET /` returns a small API index for browser checks.
-- The model trains from Firestore `project` and `investor_profiles`.
+- The model trains from Firestore `project` and `investor_profiles` collections.
 - Evaluation metrics are saved in `model_metrics.json`.
-- Firestore snapshots are saved locally for reproducible development.
-- LAN testing works when Uvicorn binds to `0.0.0.0` on port `8000`.
+- **Pakistan city locations** are fully supported and normalised — see
+  [Supported Values](#supported-values).
 
-Important modeling note:
+### Recent Fixes
 
-The project does not currently have human-curated recommendation labels.
-No populated recommendation-label collection was found in Firestore, and the
-original local `recommended_investors.csv` was missing. Because of that,
-`train_model.py` generates `recommended_investors.csv` using transparent
-rule-based compatibility logic from investor preferences to startup profiles.
-The model is technically working, but true business accuracy should later be
-improved with real historical or curated match labels.
+| Fix | Detail |
+|-----|--------|
+| Zero match score | Fixed `_coalesce_columns` bug in `recommender.py` that overwrote pre-mapped canonical feature columns with empty strings |
+| CSV data loss | Local CSV now written with `QUOTE_ALL` quoting; read with matching `quoting` parameter |
+| Auto model reload | API detects pipeline file mtime on every request and reloads without restart |
+| Collection name | Aligned to `project` (singular) to match Firestore |
+| Pakistan cities | `peshawar`, `islamabad`, `lahore`, `karachi`, `faisalabad` (and more) now map correctly in `LOCATION_ALIASES` |
+| Immediate startup sync | CSV is refreshed from Firestore before the first request, not just after the first 10-minute tick |
+
+### Important Modelling Note
+
+No human-curated recommendation labels exist in Firestore. `train_model.py`
+generates `recommended_investors.csv` using transparent rule-based
+compatibility logic (investor preferences → startup profiles). The model
+pipeline and API are fully functional, but business-grade accuracy should later
+be improved with real historical or curated match labels.
+
+---
 
 ## Project Files
 
-Core files:
+### Core
 
-- `main.py` - FastAPI backend (API v2.0.0, investor → startups).
-- `recommender.py` - shared model utilities, feature engineering, schema mapping,
-canonicalization, and recommendation logic (`RECOMMENDATION_TOP_N = 40`).
-- `train_model.py` - trains the model from Firestore data and saves metrics.
-- `3-cosine-based-system-6f-v2.1.ipynb` - notebook version of the training flow.
-- `MOBILE_INTEGRATION.md` - React Native integration guide for the investor-centric API.
-- `requirements.txt` - Python dependencies.
-- `serviceAccounts.json` - Firebase service account credentials.
+| File | Purpose |
+|------|---------|
+| `main.py` | FastAPI backend (API v3.0.0, investor → startups) |
+| `recommender.py` | Shared utilities: feature engineering, schema mapping, canonicalisation, recommendation logic |
+| `train_model.py` | Trains model from Firestore data and saves metrics |
+| `3-cosine-based-system-6f-v2.1.ipynb` | Notebook version of the training flow |
+| `MOBILE_INTEGRATION.md` | React Native integration guide |
+| `requirements.txt` | Python dependencies |
+| `serviceAccounts.json` | Firebase service account credentials (**never commit publicly**) |
 
-Generated/model files:
+### Generated / Model Files
 
+| File | Purpose |
+|------|---------|
+| `startup_investor_pipeline.pkl` | Trained scikit-learn pipeline used by the API |
+| `model_metrics.json` | Latest evaluation metrics |
+| `firebase_project_profiles.csv` | Live snapshot of Firestore `project` collection — updated every 10 minutes |
+| `firebase_investor_profiles.csv` | Snapshot of Firestore `investor_profiles` |
+| `recommended_investors.csv` | Generated positive training pairs (rule-based) |
 
+### Legacy / Fallback CSVs
 
-- `startup_investor_pipeline.pkl` - trained scikit-learn pipeline used by the API.
-- `model_metrics.json` - latest evaluation metrics.
-- `firebase_project_profiles.csv` - snapshot of Firestore `project`.
-- `firebase_investor_profiles.csv` - snapshot of Firestore `investor_profiles`.
-- `recommended_investors.csv` - generated positive training pairs when no curated
-labels exist.
+| File | Purpose |
+|------|---------|
+| `startup2.csv` | Legacy startup data — used as last-resort fallback only |
+| `investor2.csv` | Legacy investor data — used as last-resort fallback only |
 
-Legacy/source CSVs:
+The preferred training path is Firestore snapshots. These files are kept for
+local testing without Firebase access.
 
-- `startup2.csv`
-- `investor2.csv`
-
-These are still useful as fallback data, but the current preferred training path
-uses Firestore snapshots.
+---
 
 ## Architecture
 
-The recommendation system works as a pairwise classifier.
+The system works as a pairwise binary classifier.
 
-For each investor-startup pair, the model predicts the probability that the pair
-is a good match. The API scores one investor against all startup profiles and
-returns the top ranked startups (up to 40 per request) that fit the investor's preferences.
+For each investor–startup pair the model predicts the probability of a good
+match. The API scores one investor against all projects in Firestore and returns
+the top 40 results.
 
-Flow:
+```
+Firestore 'project' collection
+        │
+        ▼ (on startup + every 10 min)
+firebase_project_profiles.csv  ◄──── background refresh loop
+        │
+        ▼ (per /recommend request)
+normalize_startups()
+        │
+        ▼
+score_investor_against_startups()
+        │   PairFeatureBuilder → OneHotEncoder → StandardScaler
+        │   LogisticRegression.predict_proba()
+        ▼
+top 40 results sorted by match_score DESC
+```
 
-1. Load startup profiles and investor profiles.
-2. Normalize schemas into model feature names.
-3. Build positive and negative investor-startup pairs (top startups per investor).
-4. Add engineered match features inside the scikit-learn pipeline.
-5. Encode categorical fields and scale numeric fields.
-6. Train a logistic regression classifier.
-7. Save one pipeline artifact.
-8. Use the saved pipeline inside FastAPI for inference.
+---
 
 ## Data Sources
 
-Firestore collections used:
+### Firestore Collections
 
-- `project`
-- `investor_profiles`
+| Collection | Role |
+|------------|------|
+| `project` | Live startup/project listings — primary source |
+| `investor_profiles` | Investor preference profiles used for training |
 
-Checked but empty/missing recommendation-label collections:
+### Checked but Empty / Missing
 
 - `recommended_investors`
 - `recommendedinvestor`
 - `recommendedInvestor`
 - `recommendations`
 
-Because no real recommendation label data was available, the training script
-creates rule-based positive pairs (top matching startups per investor) and saves
-them as `recommended_investors.csv`.
+Because no real labels exist, `train_model.py` generates rule-based positive
+pairs and saves them as `recommended_investors.csv`.
+
+---
 
 ## Firestore Schemas
 
-Startup profile fields from Firestore:
+### `project` collection fields used by the model
 
-- `category`
-- `budget_range`
-- `status`
-- `location`
-- `risk_level`
-- `traction_level`
+| Firestore field | Maps to model feature |
+|-----------------|----------------------|
+| `category` | `startup_category` |
+| `budget_range` | `startup_budget_required` |
+| `projectStage` | `startup_stage` (falls back to `status` if empty) |
+| `location` | `startup_location` |
+| `risk_level` | `startup_risk_level` |
+| `traction_level` | `startup_traction_level` |
 
-Investor profile fields from Firestore:
+All other fields (`name`, `owner`, `description`, `photo`, `images`,
+`equityOffered`, `likes`, `createdAt`, `updatedAt`, etc.) are passed through
+to the API response unchanged.
 
-- `category`
-- `budget_range`
-- `preferred_stage`
-- `location`
-- `risk_preference`
-- `traction_preference`
+### `investor_profiles` collection fields used by the model
 
-The model internally uses canonical names:
+| Firestore field | Maps to model feature |
+|-----------------|----------------------|
+| `category` | `investor_category` |
+| `budget_range` | `investor_budget_range` |
+| `preferred_stage` | `investor_preferred_stage` |
+| `location` | `investor_location` |
+| `risk_preference` | `investor_risk_preference` |
+| `traction_preference` | `investor_traction_preference` |
 
-Startup-side:
-
-- `startup_category`
-- `startup_budget_required`
-- `startup_stage`
-- `startup_location`
-- `startup_risk_level`
-- `startup_traction_level`
-
-Investor-side:
-
-- `investor_category`
-- `investor_budget_range`
-- `investor_preferred_stage`
-- `investor_location`
-- `investor_risk_preference`
-- `investor_traction_preference`
-
-`recommender.py` maps Firestore fields into these canonical fields.
+---
 
 ## Supported Values
 
-Known startup/investor categories:
+### Categories
 
-- `AI`
-- `AgriTech`
-- `CleanTech`
-- `E-commerce`
-- `EdTech`
-- `FinTech`
-- `HealthTech`
-- `LogisticsTech`
-- `PropTech`
-- `SaaS`
+`AI` · `AgriTech` · `CleanTech` · `E-commerce` · `EdTech` · `FinTech` ·
+`HealthTech` · `LogisticsTech` · `PropTech` · `SaaS`
 
-Known budget ranges:
+### Budget Ranges
 
-- `10k-100k`
-- `50k-200k`
-- `100k-500k`
-- `500k-2M`
-- `2M-10M`
+`10k-100k` · `50k-200k` · `100k-500k` · `500k-2M` · `2M-10M` ·
+`5M-15M` · `15M-50M` · `50M-250M`
 
-Known startup stages:
+### Startup Stages
 
-- `Idea`
-- `MVP`
-- `Early Traction`
-- `Growth`
-- `Scaling`
+`Idea` · `MVP` · `Early Traction` · `Growth` · `Scaling`
 
-Known locations:
+### Locations
 
-- `Bangladesh`
-- `Egypt`
-- `India`
-- `Nigeria`
-- `Pakistan`
-- `Saudi Arabia`
-- `Turkey`
-- `UAE`
-- `UK`
-- `USA`
+**Pakistan cities (primary — set these in Firestore):**
 
-Known risk values:
+| City | Normalises to |
+|------|--------------|
+| Karachi | Pakistan |
+| Lahore | Pakistan |
+| Islamabad | Pakistan |
+| Peshawar | Pakistan |
+| Faisalabad | Pakistan |
+| Rawalpindi | Pakistan |
+| Quetta | Pakistan |
+| Multan | Pakistan |
+| Sialkot | Pakistan |
+| Hyderabad | Pakistan |
 
-- `Low`
-- `Medium`
-- `High`
+**Other supported locations:**
 
-Known traction values:
+`Bangladesh` · `Egypt` · `India` · `Kenya` · `Nigeria` ·
+`Saudi Arabia` · `Turkey` · `UAE` · `UK` · `USA`
 
-- `Users`
-- `Revenue`
+City aliases are also handled: `Dubai` → `UAE`, `Riyadh` → `Saudi Arabia`,
+`London` → `UK`, `Mumbai` → `India`, `Cairo` → `Egypt`, etc.
 
-Compatibility aliases were added so older API examples still work:
+### Risk Values
 
-- `500k-1M` maps to `500k-2M`
-- `Series A` maps to `Growth`
-- `Series B` / `Series C` map to `Scaling`
-- `Karachi`, `Lahore`, `Islamabad` map to `Pakistan`
-- `Dubai`, `Abu Dhabi` map to `UAE`
-- `Riyadh`, `Jeddah` map to `Saudi Arabia`
+`Low` · `Medium` · `High`
+
+### Traction Values
+
+`Users` · `Revenue`
+
+### Compatibility Aliases
+
+| Input | Resolves to |
+|-------|------------|
+| `500k-1M` | `500k-2M` |
+| `1M-5M` | `2M-10M` |
+| `Series A` | `Growth` |
+| `Series B` / `Series C` | `Scaling` |
+| `Pre-Seed` | `Idea` |
+| `Seed` | `MVP` |
+| City names (lowercase) | Country name |
+
+---
 
 ## Model Features
 
-Raw features:
+### Raw Input Features
 
-- startup category
-- startup budget
-- startup stage
-- startup location
-- startup risk level
-- startup traction level
-- investor category
-- investor budget range
-- investor preferred stage
-- investor location
-- investor risk preference
-- investor traction preference
+```
+startup_category          investor_category
+startup_budget_required   investor_budget_range
+startup_stage             investor_preferred_stage
+startup_location          investor_location
+startup_risk_level        investor_risk_preference
+startup_traction_level    investor_traction_preference
+```
 
-Engineered features added inside the pipeline:
+### Engineered Features (added inside pipeline)
 
-- `category_match_flag`
-- `location_match_flag`
-- `stage_match_flag`
-- `budget_rank_diff`
-- `budget_close_flag`
+| Feature | Description |
+|---------|-------------|
+| `category_match_flag` | 1 if startup and investor category match exactly |
+| `location_match_flag` | 1 if locations match exactly |
+| `stage_match_flag` | 1 if startup stage is in investor's preferred stages |
+| `budget_rank_diff` | Absolute difference in budget tier ranks |
+| `budget_close_flag` | 1 if budget tiers differ by ≤ 1 step |
 
-Model stack:
+### Model Stack
 
-- `PairFeatureBuilder`
-- `ColumnTransformer`
-- `OneHotEncoder(handle_unknown="ignore")`
-- `StandardScaler`
-- `LogisticRegression(class_weight="balanced")`
+```
+PairFeatureBuilder
+    └── ColumnTransformer
+            ├── OneHotEncoder(handle_unknown="ignore")  [categorical]
+            └── StandardScaler                          [numeric]
+                    └── LogisticRegression(class_weight="balanced")
+```
+
+---
 
 ## Latest Evaluation
 
-The latest model was trained from Firestore data with investor-preference labels:
+Trained from Firestore data with rule-based investor-preference labels.
 
-- Recommendation direction: `investor_to_startups`
-- Startup profiles: `500`
-- Investor profiles: `500`
-- Positive pairs: `2500`
-- Negative pairs: `2500`
-- Total pairs: `5000`
-- Test size: `1000`
+| Metric | Value |
+|--------|-------|
+| Startup profiles | 500 |
+| Investor profiles | 500 |
+| Positive pairs | 2,500 |
+| Negative pairs | 2,500 |
+| Total pairs | 5,000 |
+| Test size | 1,000 |
+| Accuracy | 0.988 |
+| Precision | 0.9803 |
+| Recall | 0.9960 |
+| F1 | 0.9881 |
+| ROC-AUC | 0.9981 |
+| Average Precision | 0.9979 |
 
-Latest metrics saved in `model_metrics.json`:
+Score distribution on test set: min `0.00`, max `1.00`, mean `0.50`, median `0.68`.
 
-- Accuracy: `0.988`
-- Precision: `0.9803`
-- Recall: `0.996`
-- F1: `0.9881`
-- ROC-AUC: `0.9981`
-- Average precision: `0.9979`
+> These scores are against generated rule-based labels. They verify the pipeline
+> and API are working correctly but should not be treated as final business
+> accuracy.
 
-Score distribution on the test set:
-
-- Minimum score: `0.0000000101`
-- Maximum score: `0.99998`
-- Mean score: `0.5018`
-- Median score: `0.6811`
-
-These scores are against generated rule-based labels. They are useful for
-verifying the pipeline and API behavior, but they should not be treated as final
-business-grade accuracy.
+---
 
 ## Setup
 
-Use PowerShell from the project directory:
-
 ```powershell
 cd C:\Users\moham\OneDrive\Documents\model
-```
-
-Install dependencies:
-
-```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-```
-
-Check dependencies:
-
-```powershell
 .\.venv\Scripts\python.exe -m pip check
-```
-
-Compile-check Python files:
-
-```powershell
 .\.venv\Scripts\python.exe -m py_compile main.py recommender.py train_model.py
 ```
 
-## Training
+---
 
-Train from Firebase:
+## Training
 
 ```powershell
 .\.venv\Scripts\python.exe train_model.py
@@ -311,382 +307,222 @@ Train from Firebase:
 
 This command:
 
-- reads Firestore `project`
-- reads Firestore `investor_profiles`
-- saves local Firebase snapshots
-- creates `recommended_investors.csv` if curated labels are missing
-- trains the scikit-learn pipeline
-- saves `startup_investor_pipeline.pkl`
-- saves `model_metrics.json`
+1. Reads Firestore `project` collection
+2. Reads Firestore `investor_profiles` collection
+3. Saves local snapshots with all fields preserved (`QUOTE_ALL`)
+4. Creates `recommended_investors.csv` if curated labels are missing
+5. Trains the scikit-learn pipeline
+6. Saves `startup_investor_pipeline.pkl`
+7. Saves `model_metrics.json`
 
-After retraining, restart the API so the new model is loaded.
+**No server restart needed.** The API detects the updated pipeline file on the
+next request and reloads it automatically.
 
-## Running the API Locally
+---
 
-Local CSV/snapshot mode:
+## Running the API
+
+### Local CSV mode (default — fastest)
 
 ```powershell
 Remove-Item Env:USE_FIRESTORE -ErrorAction SilentlyContinue
 .\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-In this mode, the API reads startups from `firebase_project_profiles.csv`.
-If that file does not exist, it falls back to `startup2.csv`.
+Reads startups from `firebase_project_profiles.csv`. If that file does not
+exist, triggers an immediate Firestore sync to create it.
 
-Firestore mode:
+### Firestore mode (reads live on every request)
 
 ```powershell
 $env:USE_FIRESTORE = "1"
 .\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-In this mode, the API loads startups directly from Firestore
-`project`.
-
-Do not use `--reload` for this project unless you exclude `.venv`. On Windows,
-the reloader can watch `.venv` and repeatedly restart after notebook packages
-such as `ipykernel` are installed.
-
-## Running as a LAN Server
-
-To allow phones or other devices on the same Wi-Fi to access the API, bind to
-all interfaces:
+### LAN mode (phones on same Wi-Fi)
 
 ```powershell
-cd C:\Users\moham\OneDrive\Documents\model
 $env:USE_FIRESTORE = "1"
 .\.venv\Scripts\python.exe -m uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-For this machine, the LAN IP used during testing was:
+LAN IP used during testing: `192.168.18.207`
 
-```text
-192.168.18.207
-```
+> Do not use `--reload` unless you exclude `.venv`. On Windows the reloader
+> watches `.venv` and restarts repeatedly due to notebook packages.
 
-Frontend/base URL for devices on the same Wi-Fi:
+---
 
-```text
-http://192.168.18.207:8000
-```
+## Environment Variables
 
-Health URL:
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `USE_FIRESTORE` | `0` | Set to `1` to read startups from Firestore on every request |
+| `AUTO_REFRESH_CSV` | `1` | Set to `0` to disable background CSV refresh |
+| `CSV_REFRESH_SECONDS` | `600` | How often (seconds) to refresh the local CSV |
+| `LOCAL_PROJECTS_PATH` | `firebase_project_profiles.csv` | Path to the local projects CSV cache |
+| `FIREBASE_CREDENTIALS_JSON` | *(unset)* | Full service account JSON for Railway/cloud deployment |
 
-```text
-http://192.168.18.207:8000/health
-```
-
-Recommendation URL:
-
-```text
-http://192.168.18.207:8000/recommend
-```
-
-If a phone cannot reach the API:
-
-- confirm the API is running
-- confirm the phone and laptop are on the same Wi-Fi
-- temporarily disable mobile data on the phone
-- turn off VPN on both devices
-- allow Python/Uvicorn through Windows Firewall on private networks
-- check `http://192.168.18.207:8000/health` first
+---
 
 ## API Endpoints
 
 ### GET /
 
-Browser-friendly index route.
-
-Example:
-
-```text
-GET http://127.0.0.1:8000/
-```
-
-Response:
-
 ```json
 {
   "status": "ok",
   "message": "Investor-Startup Recommendation API is running.",
-  "api_version": "2.0.0",
-  "recommendation_direction": "investor_to_startups",
-  "recommendation_limit": 40,
-  "endpoints": {
-    "health": "/health",
-    "docs": "/docs",
-    "recommend": "/recommend"
-  }
+  "api_version": "3.0.0",
+  "endpoints": { "health": "/health", "docs": "/docs", "recommend": "/recommend" }
 }
 ```
 
 ### GET /health
 
-Checks whether the API and model are ready.
-
-Example:
-
-```text
-GET http://127.0.0.1:8000/health
-```
-
-Local mode response:
-
 ```json
 {
   "status": "ok",
-  "api_version": "2.0.0",
-  "recommendation_direction": "investor_to_startups",
-  "recommendation_limit": 40,
+  "api_version": "3.0.0",
   "model_loaded": true,
+  "firestore_ready": true,
   "data_source": "local_csv",
-  "firestore_ready": false
-}
-```
-
-Firestore mode response:
-
-```json
-{
-  "status": "ok",
-  "api_version": "2.0.0",
-  "recommendation_direction": "investor_to_startups",
+  "local_csv": "firebase_project_profiles.csv",
+  "local_csv_exists": true,
+  "local_csv_rows": 12,
+  "auto_refresh_enabled": true,
+  "auto_refresh_interval_seconds": 600,
   "recommendation_limit": 40,
-  "model_loaded": true,
-  "data_source": "firestore",
-  "firestore_ready": true
+  "firestore_collection": "project"
 }
 ```
 
 ### POST /recommend
 
-Returns up to 40 top startup recommendations for one investor profile.
-
-Important: `/recommend` only accepts `POST`. Opening `/recommend` in a browser
-sends `GET`, so FastAPI returns:
-
-```json
-{"detail":"Method Not Allowed"}
-```
-
-Use `/docs`, PowerShell, Postman, or React Native `fetch` to send a POST request.
-
 Canonical request body:
 
 ```json
 {
-  "investor_category": "FinTech",
-  "investor_budget_range": "500k-2M",
+  "investor_category":        "EdTech",
+  "investor_budget_range":    "2M-10M",
   "investor_preferred_stage": "Growth,Scaling",
-  "investor_location": "Pakistan",
-  "investor_risk_preference": "Medium",
-  "investor_traction_preference": "Revenue"
+  "investor_location":        "Pakistan",
+  "investor_risk_preference":     "High",
+  "investor_traction_preference": "Users"
 }
 ```
 
-Firestore-style request body is also accepted:
+Firestore-style fields are also accepted (`category`, `budget_range`,
+`preferred_stage`, `location`, `risk_preference`, `traction_preference`).
+
+Example response item:
 
 ```json
 {
-  "category": "FinTech",
+  "startup_id": "La7XOi9oflVspQb6uRUG",
+  "name": "E-test",
+  "category": "EdTech",
+  "description": "Online tests platform",
   "budget_range": "500k-2M",
-  "preferred_stage": "Growth,Scaling",
-  "location": "Pakistan",
-  "risk_preference": "Medium",
-  "traction_preference": "Revenue"
+  "projectStage": "Scaling",
+  "location": "Peshawar",
+  "traction_level": "Users",
+  "risk_level": "High",
+  "startup_category": "EdTech",
+  "startup_budget_required": "500k-2M",
+  "startup_stage": "Scaling",
+  "startup_location": "Peshawar",
+  "startup_risk_level": "High",
+  "startup_traction_level": "Users",
+  "match_score": 0.9933
 }
 ```
 
-Example response:
+---
 
-```json
-{
-  "recommendations": [
-    {
-      "startup_id": "S140",
-      "category": "FinTech",
-      "budget_range": "2M-10M",
-      "status": "Scaling",
-      "location": "Pakistan",
-      "traction_level": "Revenue",
-      "risk_level": "Medium",
-      "match_score": 0.9991
-    }
-  ]
-}
-```
+## Testing
 
-## Testing with PowerShell
-
-Health:
+### PowerShell
 
 ```powershell
+# Health check
 Invoke-RestMethod http://127.0.0.1:8000/health
-```
 
-Recommendation:
-
-```powershell
+# Recommendation
 $body = @{
-  category = "FinTech"
-  budget_range = "500k-2M"
-  preferred_stage = "Growth,Scaling"
-  location = "Pakistan"
-  risk_preference = "Medium"
-  traction_preference = "Revenue"
+  investor_category        = "EdTech"
+  investor_budget_range    = "2M-10M"
+  investor_preferred_stage = "Growth,Scaling"
+  investor_location        = "Pakistan"
+  investor_risk_preference     = "High"
+  investor_traction_preference = "Users"
 } | ConvertTo-Json
 
 Invoke-RestMethod http://127.0.0.1:8000/recommend -Method Post -Body $body -ContentType "application/json"
 ```
 
-## React Native Integration
-
-Use this endpoint when the API is running on the same computer:
-
-```text
-http://127.0.0.1:8000/recommend
-```
-
-Use this endpoint for Android emulator:
-
-```text
-http://10.0.2.2:8000/recommend
-```
-
-Use this endpoint for a physical phone on the same Wi-Fi:
-
-```text
-http://192.168.18.207:8000/recommend
-```
-
-Example React Native request:
+### React Native
 
 ```js
 const response = await fetch("http://192.168.18.207:8000/recommend", {
   method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    category: "FinTech",
-    budget_range: "500k-2M",
-    preferred_stage: "Growth,Scaling",
-    location: "Pakistan",
-    risk_preference: "Medium",
-    traction_preference: "Revenue",
+    investor_category:        "EdTech",
+    investor_budget_range:    "2M-10M",
+    investor_preferred_stage: "Growth,Scaling",
+    investor_location:        "Pakistan",
+    investor_risk_preference:     "High",
+    investor_traction_preference: "Users",
   }),
 });
-
 const data = await response.json();
 console.log(data.recommendations);
 ```
 
-## Notebook
-
-The notebook `3-cosine-based-system-6f-v2.1.ipynb` mirrors the model training
-workflow.
-
-It now prefers:
-
-- `firebase_project_profiles.csv`
-- `firebase_investor_profiles.csv`
-- `recommended_investors.csv`
-
-If Firebase snapshots do not exist, it falls back to:
-
-- `startup2.csv`
-- `investor2.csv`
-
-Recommended workflow:
-
-1. Run `train_model.py` first to refresh Firebase snapshots.
-2. Open the notebook.
-3. Run all cells from top to bottom.
+---
 
 ## Troubleshooting
 
-`{"detail":"Not Found"}` on the base URL:
+| Symptom | Fix |
+|---------|-----|
+| `404 Not Found` on base URL | Use `http://host:8000/` or `/docs` |
+| `405 Method Not Allowed` on `/recommend` | Use POST, not GET |
+| All scores are 0.0 | Retrain with `train_model.py`; check field names match schema |
+| `firebase_project_profiles.csv` is stale | Wait for 10-min refresh, or restart API (immediate sync on startup) |
+| Phone cannot connect | Use `--host 0.0.0.0`; confirm same Wi-Fi; disable VPN |
+| Port 8000 already in use | `netstat -ano \| Select-String ':8000'` then `Stop-Process -Id <PID> -Force` |
+| `/recommend` returns old results | An old Uvicorn process is still running — kill all PIDs on port 8000 |
+| `local_csv_rows: 0` in `/health` | Firestore `project` collection is empty or credentials are wrong |
 
-- Fixed by adding `GET /`.
-- Use `http://host:8000/` or `http://host:8000/docs`.
-
-`{"detail":"Method Not Allowed"}` on `/recommend`:
-
-- `/recommend` is a POST endpoint.
-- Use `/docs`, PowerShell, Postman, or React Native `fetch`.
-
-Scores are all zero or too low:
-
-- Make sure the latest `startup_investor_pipeline.pkl` is loaded.
-- Restart Uvicorn after retraining.
-- Make sure request fields match accepted schema.
-- Prefer Firestore-style fields: `category`, `budget_range`, `preferred_stage`,
-`location`, `risk_preference`, `traction_preference`.
-- Check `model_metrics.json` and test `/recommend` with the sample payload.
-
-Phone cannot connect to LAN server:
-
-- Start Uvicorn with `--host 0.0.0.0`.
-- Use the laptop LAN IP, for example `http://192.168.18.207:8000`.
-- Ensure both devices are on the same Wi-Fi.
-- Allow Python through Windows Firewall.
-
-Port 8000 already in use:
-
-```powershell
-netstat -ano | Select-String ':8000'
-```
-
-Then stop **all** processes using port 8000 (old servers can keep running and serve outdated code):
-
-```powershell
-Stop-Process -Id <PID> -Force
-```
-
-Restart with a single server:
-
-```powershell
-cd C:\Users\moham\OneDrive\Documents\model
-$env:USE_FIRESTORE = "1"
-.\.venv\Scripts\python.exe -m uvicorn main:app --host 0.0.0.0 --port 8000
-```
-
-Confirm the correct version via `/health` — you should see `"recommendation_limit": 40` and `"recommendation_direction": "investor_to_startups"`.
-
-`/recommend` still returns only 10 results or investors instead of startups:
-
-- An old Uvicorn process is probably still bound to port `8000`.
-- Run `netstat -ano | Select-String ':8000'` and stop every PID listed.
-- Start only one server with the latest code (see commands above).
-- Re-check `/health` before testing `/docs`.
+---
 
 ## Stopping the API
 
-If the server is running in the current terminal, press:
-
-```text
-Ctrl+C
-```
-
-If it was started in the background and `.uvicorn.pid` exists:
-
 ```powershell
+# Current terminal
+Ctrl+C
+
+# Background process
 Stop-Process -Id (Get-Content .uvicorn.pid) -Force
 ```
 
+---
+
 ## Security Notes
 
-- Do not commit or share `serviceAccounts.json` publicly.
-- The current API has no authentication layer.
-- Before production deployment, add authentication, rate limiting, CORS policy,
-HTTPS, and proper secret management.
+- **Never commit `serviceAccounts.json`** — add it to `.gitignore`.
+- The API has no authentication layer. Before production, add auth, rate
+  limiting, CORS policy, HTTPS, and proper secret management.
+- On Railway, supply credentials via `FIREBASE_CREDENTIALS_JSON` env var.
+
+---
 
 ## Recommended Next Improvements
 
 - Replace generated rule-based labels with real curated or historical match data.
-- Add API authentication for the mobile app.
+- Add API authentication (JWT or API key) for the mobile app.
 - Add CORS configuration for deployed frontend/mobile environments.
-- Cache Firestore startup profiles for faster repeated recommendation calls.
-- Add a deployment script or Dockerfile.
+- Add a `/retrain` endpoint to trigger retraining from Railway without SSH.
 - Add automated tests for training, scoring, and API endpoints.
-
+- Add a Dockerfile for portable deployment.
