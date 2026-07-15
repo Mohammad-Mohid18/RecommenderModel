@@ -1,4 +1,4 @@
-budget_range,investorId,risk_preference,profileCompleted,category,preferred_stage,location,traction_preference,investor_id,ratingSum,averageRating,ratingCount
+budget_range,investorId,risk_preference,profileCompleted,category,preferred_stage,location,traction_preference,investor_id,averageRating,ratingSum,ratingCount
 50k-200k,I1,High,True,SaaS,Early Traction,Egypt,None,I1,,,
 10k-100k,I10,High,True,AI,"Idea,MVP,Early Traction",Bangladesh,None,I10,,,
 500k-2M,I100,Medium,True,E-commerce,"MVP,Early Traction,Growth",Nigeria,Users,I100,,,
@@ -501,6 +501,7 @@ budget_range,investorId,risk_preference,profileCompleted,category,preferred_stag
 10k-100k,I99,Medium,True,AI,"Growth,Scaling",Bangladesh,Users,I99,,,
 10k-100k,I505,Medium,True,AI,MVP,Pakistan,Users,JokSuFbeWqcAmpgqd29qHMcVcx73,,,
 10k-100k,I501,High,True,CleanTech,Idea,Pakistan,Users,OO4x9xPWPCcl2NARFazzRkQ0Qtw1,,,
-10k-100k,I502,Low,True,SaaS,MVP,Pakistan,None,e0YvsYtru2M9nyTB8dvmAdpdx4d2,,,
-100k-500k,I503,High,True,EdTech,Growth,Saudi Arabia,Users,hooJScx0APP7r9pZ8HNkcst0WLv1,,,
-50k-200k,I504,Medium,True,AI,Growth,Bangladesh,Revenue,s1q28bDhvuW5O9UCrvlsfMHiKOj2,4.0,4.0,1.0
+10k-100k,I502,Low,True,SaaS,MVP,Islamabad,None,e0YvsYtru2M9nyTB8dvmAdpdx4d2,,,
+50k-200k,I503,High,True,EdTech,Growth,Peshawar,Users,hooJScx0APP7r9pZ8HNkcst0WLv1,,,
+50k-200k,I504,Medium,True,AI,Growth,Peshawar,Revenue,s1q28bDhvuW5O9UCrvlsfMHiKOj2,4.5,9.0,2.0
+50k-200k,I506,Low,True,HealthTech,MVP,Islamabad,Users,yDf10IYNIhdh9DiWNBApwcNV2Pm2,,,

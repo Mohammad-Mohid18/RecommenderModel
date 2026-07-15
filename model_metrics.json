@@ -2,134 +2,202 @@
   "data_source": "firestore",
   "recommendation_direction": "investor_to_startups",
   "label_source": "rule_based_investor_preferences_from_firestore",
-  "project_profiles": 18,
-  "investor_profiles": 505,
-  "positive_pairs": 2525,
-  "negative_pairs": 2525,
-  "total_pairs": 5050,
-  "test_size": 1010,
-  "accuracy": 0.9099009900990099,
-  "precision": 0.8996138996138996,
-  "recall": 0.9227722772277228,
-  "f1": 0.9110459433040078,
-  "roc_auc": 0.9692030193118322,
-  "average_precision": 0.9668945399285896,
+  "project_profiles": 35,
+  "investor_profiles": 506,
+  "positive_pairs": 2530,
+  "negative_pairs": 2530,
+  "total_pairs": 5060,
+  "test_size": 1012,
+  "accuracy": 0.9466403162055336,
+  "precision": 0.9346153846153846,
+  "recall": 0.9604743083003953,
+  "f1": 0.9473684210526315,
+  "roc_auc": 0.9891499632864128,
+  "average_precision": 0.9886970410375558,
   "confusion_matrix": [
     [
-      453,
-      52
+      472,
+      34
     ],
     [
-      39,
-      466
+      20,
+      486
     ]
   ],
   "classification_report": {
     "0": {
-      "precision": 0.9207317073170732,
-      "recall": 0.897029702970297,
-      "f1-score": 0.9087261785356068,
-      "support": 505.0
+      "precision": 0.959349593495935,
+      "recall": 0.932806324110672,
+      "f1-score": 0.9458917835671342,
+      "support": 506.0
     },
     "1": {
-      "precision": 0.8996138996138996,
-      "recall": 0.9227722772277228,
-      "f1-score": 0.9110459433040078,
-      "support": 505.0
+      "precision": 0.9346153846153846,
+      "recall": 0.9604743083003953,
+      "f1-score": 0.9473684210526315,
+      "support": 506.0
     },
-    "accuracy": 0.9099009900990099,
+    "accuracy": 0.9466403162055336,
     "macro avg": {
-      "precision": 0.9101728034654863,
-      "recall": 0.9099009900990099,
-      "f1-score": 0.9098860609198073,
-      "support": 1010.0
+      "precision": 0.9469824890556597,
+      "recall": 0.9466403162055337,
+      "f1-score": 0.9466301023098829,
+      "support": 1012.0
     },
     "weighted avg": {
-      "precision": 0.9101728034654865,
-      "recall": 0.9099009900990099,
-      "f1-score": 0.9098860609198073,
-      "support": 1010.0
+      "precision": 0.9469824890556597,
+      "recall": 0.9466403162055336,
+      "f1-score": 0.9466301023098829,
+      "support": 1012.0
     }
   },
   "score_stats_test": {
-    "min": 2.3794773220631403e-06,
-    "max": 0.9999998408154287,
-    "mean": 0.50490203804932,
-    "median": 0.5404407931772086
+    "min": 1.079909802613366e-05,
+    "max": 0.9999997608190049,
+    "mean": 0.4983598575955222,
+    "median": 0.5442862725766664
   },
   "sample_investor_id": "I1",
   "sample_recommendation_scores": [
     {
+      "startup_id": "kZHalSqZ6TbxO2t2EB7X",
+      "match_score": 0.9999
+    },
+    {
+      "startup_id": "Ft0vvBVy2WExl1Re1OpH",
+      "match_score": 0.9988
+    },
+    {
       "startup_id": "8bvklkEYFdcWqXaxsfVB",
-      "match_score": 0.9998
+      "match_score": 0.9721
     },
     {
-      "startup_id": "LsPGIh0YInHBgE6CkdI2",
-      "match_score": 0.9996
+      "startup_id": "57tTBfxXz2aRIjtDt91r",
+      "match_score": 0.9282
     },
     {
-      "startup_id": "VcyMspBjj4Lij97s8iyd",
-      "match_score": 0.9926
+      "startup_id": "8PpiSAPyXutGgkoVzs78",
+      "match_score": 0.904
+    },
+    {
+      "startup_id": "insHel9MOJPKmMFVfpBV",
+      "match_score": 0.6889
+    },
+    {
+      "startup_id": "1bUlVf4xlNocPT1f1QYU",
+      "match_score": 0.331
+    },
+    {
+      "startup_id": "yuCwGShLGQY5647m1nG9",
+      "match_score": 0.2265
+    },
+    {
+      "startup_id": "uCXyCuBXcc5hBBZREEvR",
+      "match_score": 0.1318
+    },
+    {
+      "startup_id": "wqSGFi5RLueIp9jFW4wt",
+      "match_score": 0.1276
     },
     {
       "startup_id": "RnCq8QQ4A1x1jjsk2QNQ",
-      "match_score": 0.8109
-    },
-    {
-      "startup_id": "3mhAupMtT2rUsRE8xpbt",
-      "match_score": 0.8075
-    },
-    {
-      "startup_id": "J1xIZceKmoo8sY4QAalj",
-      "match_score": 0.647
+      "match_score": 0.094
     },
     {
       "startup_id": "rhm17rZeXVAHUisobeEM",
-      "match_score": 0.4222
+      "match_score": 0.0384
     },
     {
-      "startup_id": "oQLukJGHGGBqj3QKCro0",
-      "match_score": 0.3746
+      "startup_id": "mWS6ZBjLM7v34zFbBXmu",
+      "match_score": 0.0254
     },
     {
-      "startup_id": "vaQtR7Nz2PnAudlq2qnt",
-      "match_score": 0.1909
+      "startup_id": "J1xIZceKmoo8sY4QAalj",
+      "match_score": 0.0169
     },
     {
-      "startup_id": "9WgIeytvE3kBNiDRnBj8",
-      "match_score": 0.1656
+      "startup_id": "3mhAupMtT2rUsRE8xpbt",
+      "match_score": 0.0152
     },
     {
-      "startup_id": "S2CfLrt2jtgmiQB3NU7Q",
-      "match_score": 0.1032
+      "startup_id": "a6KPPlbQAlgGuKoz9eAX",
+      "match_score": 0.0128
     },
     {
-      "startup_id": "GUgRYiBIN094eUkqwA0r",
-      "match_score": 0.0846
+      "startup_id": "Kj27vlcp8IqBTIdBmlcx",
+      "match_score": 0.0117
+    },
+    {
+      "startup_id": "hpSI95oZbzzl4Di9aJBe",
+      "match_score": 0.0097
+    },
+    {
+      "startup_id": "1lEPQPkqWFGFWalzVfVj",
+      "match_score": 0.0043
+    },
+    {
+      "startup_id": "E3apXHP1HKEV9IRK5KXo",
+      "match_score": 0.002
+    },
+    {
+      "startup_id": "3YkuREXWGWlonSKWThG4",
+      "match_score": 0.0012
+    },
+    {
+      "startup_id": "CN7V4bukdc0g8jNYHHSx",
+      "match_score": 0.0012
     },
     {
       "startup_id": "BkYBKY272QrSuN3kkocO",
-      "match_score": 0.0809
+      "match_score": 0.0012
     },
     {
-      "startup_id": "UjxjDZxZ5RgQnEXMpzKr",
-      "match_score": 0.06
+      "startup_id": "sTi5rE4mfbMU5xJiCn8k",
+      "match_score": 0.0008
     },
     {
-      "startup_id": "zgCxnmazw0G2T0jsNqyD",
-      "match_score": 0.0146
+      "startup_id": "hPzEC5t9svIkKs5RPXGU",
+      "match_score": 0.0007
     },
     {
-      "startup_id": "La7XOi9oflVspQb6uRUG",
-      "match_score": 0.0116
+      "startup_id": "reZq4OiLEk3fqQZQkHPO",
+      "match_score": 0.0007
+    },
+    {
+      "startup_id": "XrGfdKco3ywnPaBeUbWb",
+      "match_score": 0.0006
+    },
+    {
+      "startup_id": "gVIpjWo2PkA3KSJqDO5Q",
+      "match_score": 0.0005
+    },
+    {
+      "startup_id": "OPIiirVFYZDoi4QjDvTU",
+      "match_score": 0.0004
+    },
+    {
+      "startup_id": "LYVdQyb0Ds5dSZ1EL9Qd",
+      "match_score": 0.0003
     },
     {
       "startup_id": "PsCAnx9hi3uNBSIyGEpz",
-      "match_score": 0.0088
+      "match_score": 0.0002
+    },
+    {
+      "startup_id": "VRavX7RWMPBESgZXlO6q",
+      "match_score": 0.0002
+    },
+    {
+      "startup_id": "mZKq6RYRupE16EwsjSXP",
+      "match_score": 0.0001
+    },
+    {
+      "startup_id": "ymbHDm6ODeemVwlu71tq",
+      "match_score": 0.0001
     },
     {
       "startup_id": "t9K6uIH3RBJsNQuv5qaU",
-      "match_score": 0.0009
+      "match_score": 0.0
     }
   ]
 }
